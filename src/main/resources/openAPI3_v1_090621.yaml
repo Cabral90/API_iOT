@@ -1,0 +1,1396 @@
+openapi: 3.0.0
+info:
+  title: OpenApi3 iOT ChirpStack
+  description: >-
+    OpenApi3 iOT ChirpStack Server, user data management and interaction API and
+    integrated device humidity and temperature sensor.
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: devext3@gantabi.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+servers:
+  - url: 'https://localhost:8080/v1'
+  - url: 'http://localhost:8080/v1'
+tags:
+  - name: iOT Company
+    description: Crud company
+    externalDocs:
+      description: Company registration and maintenance
+      url: 'http://swagger.io'
+  - name: iOT User
+    description: User registration and maintenance
+  - name: iOT Device
+    description: Operations about User
+    externalDocs:
+      description: Find out more about our Device
+      url: 'http://swagger.io'
+paths:
+  /companies:
+    post:
+      tags:
+        - company
+      summary: Create a new Company
+      operationId: createCompany
+      requestBody:
+        description: Company object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+    put:
+      tags:
+        - company
+      summary: Update an existing Company
+      operationId: updateCompany
+      parameters:
+        - name: companyId
+          in: query
+          description: The ID Comapy
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Comapny object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompany'
+        required: true
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
+    get:
+      tags:
+        - company
+      summary: Get all Companies
+      description: Returns all Company
+      operationId: getAllCompany
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+    delete:
+      tags:
+        - company
+      summary: Deletes a Company
+      operationId: deleteCompany
+      parameters:
+        - name: companyId
+          in: query
+          description: Company id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+  '/companies/{companyId}':
+    get:
+      tags:
+        - company
+      summary: Find Company by ID
+      description: Returns a single Company
+      operationId: getCompanyById
+      parameters:
+        - name: companyId
+          in: path
+          description: ID of Company to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+
+  /users:
+    post:
+      tags:
+        - user
+      summary: Create a new User
+      operationId: createUser
+      requestBody:
+        description: User object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+    put:
+      tags:
+        - user
+      summary: Update an existing User
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: query
+          description: The ID for User
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: User object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+        required: true
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
+    get:
+      tags:
+        - user
+      summary: Get all Useres
+      description: Returns list for User
+      operationId: getAllUser
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUser'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+    delete:
+      tags:
+        - user
+      summary: Deletes a User
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: query
+          description: User id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+
+
+  '/users/{userId}':
+    get:
+      tags:
+        - user
+      summary: Get User by ID
+      description: Returns a single User
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          description: ID of User to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+
+  /passwords:
+    put:
+      tags:
+        - password
+      summary: Update Password
+      operationId: updatePassword
+      parameters:
+        - name: userId
+          in: query
+          description: The ID for User
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: User object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePassword'
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
+
+    post:
+      tags:
+        - password
+      summary: Fogout Password
+      operationId: fogoutPassword
+      requestBody:
+        description: create a new password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgetPassword'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+
+  /sessions:
+    get:
+      tags:
+        - session
+      summary: Get session state
+      operationId: statusSession
+      parameters:
+        - name: sessionId
+          in: query
+          description: The ID for session
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusUser'
+
+        '400':
+          description: Invalid ID
+        '404':
+          description: Session not found
+          content: {}
+    post:
+      tags:
+        - session
+      summary: Logs User into the system
+      operationId: login
+      parameters:
+        - name: email
+          in: query
+          description: The user email for login
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: password
+          in: query
+          description: The password for login
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginOk'
+        '400':
+          description: Invalid username/password supplied
+          content: {}
+    delete:
+      tags:
+        - session
+      summary: Logout current logged in User session
+      operationId: logout
+      parameters:
+        - name: sessionId
+          in: query
+          description: The ID for session
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        default:
+          description: successful operation
+          content: {}
+  /tasks:
+    post:
+      tags:
+        - task
+      summary: Create a new Task for User
+      operationId: createTask
+      requestBody:
+        description: Task object that fdefinition for user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+    put:
+      tags:
+        - task
+      summary: Update an existing Task
+      operationId: updateTask
+      parameters:
+        - name: taskId
+          in: query
+          description: The ID for Task
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Task object that fdefinition for user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateTask'
+        required: true
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Task not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+        - task
+      summary: Deletes a Task
+      operationId: deleteTask
+      parameters:
+        - name: taskId
+          in: query
+          description: Task id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Task not found
+          content: {}
+    get:
+      tags:
+        - task
+      summary: Get all Tasks
+      description: Returns List a Tasks
+      operationId: getAllTask
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTasks'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Task not found
+          content: {}
+  '/tasks/{taskId}':
+    get:
+      tags:
+        - task
+      summary: Get Task by ID
+      description: Returns a single Task
+      operationId: getTaskById
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Task not found
+          content: {}
+  '/users/{userId}/tasks':
+    get:
+      tags:
+        - task
+      summary: Get all Task by ID User
+      description: Returns all single Task
+      operationId: getTaskByIdUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTasks'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Task not found
+          content: {}
+  /devices:
+    post:
+      tags:
+        - device
+      summary: create a new Device
+      operationId: createDevice
+      requestBody:
+        description: Device object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+    put:
+      tags:
+        - device
+      summary: Update an existing Device
+      operationId: updateDevice
+      parameters:
+        - name: deviceId
+          in: query
+          description: The ID for Device
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Device object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDevice'
+        required: true
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+      x-codegen-request-body-name: body
+    get:
+      tags:
+        - device
+      summary: Get all Devices
+      description: Returns all Device
+      operationId: getAllDevice
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDeviceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+    delete:
+      tags:
+        - device
+      summary: Delete a Device
+      operationId: deleteDevice
+      parameters:
+        - name: deviceId
+          in: query
+          description: The ID for Device
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        default:
+          description: successful operation
+          content: {}
+  '/devices/{deviceId}':
+    get:
+      tags:
+        - device
+      summary: Get Device by ID
+      description: Returns a single Device
+      operationId: getDeviceById
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+  '/devices/{name}':
+    get:
+      tags:
+        - device
+      summary: Get Device by Name
+      description: Returns a single Device
+      operationId: getDeviceByName
+      parameters:
+        - name: name
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindDeviceByName'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Name not found
+          content: {}
+  '/users/{userId}/devices':
+    get:
+      tags:
+        - device
+      summary: Get all devices by ID User
+      description: Returns array Device
+      operationId: getAllDeviceByIdUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDeviceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+  '/comapanies/{companyId}/devices':
+    get:
+      tags:
+        - device
+      summary: Get all devices by ID Company
+      description: Returns array Device
+      operationId: getAllDeviceByIdCompany
+      parameters:
+        - name: companyId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDeviceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/comapanies/{companyId}/avg-temperature':
+    get:
+      tags:
+        - device
+      summary: Get AVG temperature all device by ID Company
+      description: Get AVG temperature by ID Company
+      operationId: getAllAvgTemperatureByCompany
+      parameters:
+        - name: companyId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+
+  '/comapanies/{companyId}/avg-humidities':
+    get:
+      tags:
+        - device
+      summary: Get AVG humidity all device by ID Company
+      description: Get AVG humidity by ID Company
+      operationId: getAllAvgHumidityByCompany
+      parameters:
+        - name: companyId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/comapanies/{companyId}/sum-devices':
+    get:
+      tags:
+        - device
+      summary: Get SUM all device by ID Company
+      description: Get AVG temperature by ID Company
+      operationId: getSumDiviceByCompany
+      parameters:
+        - name: companyId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/users/{userId}/avg-temperatures':
+    get:
+      tags:
+        - device
+      summary: Get AVG device by ID User
+      description: Get SUM device by ID User
+      operationId: getSumByIdUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+  '/users/{userId}/avg-humidities':
+    get:
+      tags:
+        - device
+      summary: Get AVG humidity by ID User
+      description: Get SUM humidity by ID Company
+      operationId: sumHumidityByCompany
+      parameters:
+        - name: userId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+  '/users/{userId}/sum-devices':
+    get:
+      tags:
+        - device
+      summary: Get SUM all device by ID User
+      description: Get AVG temperature by ID Company
+      operationId: getSumDiviceByUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  /alerts:
+    get:
+      tags:
+        - alert
+      summary: Get all alerts
+      description: Returns a mesage for User
+      operationId: getAllAlert
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  '/devices/{name}/alerts':
+    get:
+      tags:
+        - alert
+      summary: Get Alert by Name Device
+      description: Returns a single Alert
+      operationId: getAlertByName
+      parameters:
+        - name: name
+          in: path
+          description: Name of device to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Name not found
+          content: {}
+  '/users/{userId}/alerts':
+    get:
+      tags:
+        - alert
+      summary: Get all Alert by ID User
+      description: Returns all  Alert User
+      operationId: getAlertByIdUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of User to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: ID not found
+          content: {}
+components:
+  schemas:
+    Company:
+      required:
+        - address
+        - codePostal
+        - companyId
+        - companyName
+        - email
+        - nif
+        - phone
+        - web
+      type: object
+      additionalProperties: false
+      properties:
+        companyId:
+          type: string
+          format: uuid
+        companyName:
+          type: string
+        nif:
+          type: string
+        address:
+          type: string
+        codePostal:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        web:
+          type: string
+
+    UpdateCompany:
+      required:
+        - address
+        - codePostal
+        - companyName
+        - nif
+        - phone
+        - web
+      type: object
+      additionalProperties: false
+      properties:
+        companyName:
+          type: string
+        nif:
+          type: string
+        address:
+          type: string
+        codePostal:
+          type: string
+        phone:
+          type: string
+        web:
+          type: string
+
+    CompanyList:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Company'
+        size:
+          type: integer
+          format: int64
+
+    User:
+      required:
+        - companyId
+        - email
+        - name
+        - nicknames
+        - password
+        - roleId
+        - userId
+      type: object
+      additionalProperties: false
+      properties:
+        userId:
+          type: string
+          format: uuid
+        roleId:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        nicknames:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+
+    UpdateUser:
+      required:
+        - companyId
+        - name
+        - nicknames
+        - roleId
+        - userId
+      type: object
+      additionalProperties: false
+      properties:
+        roleId:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        nicknames:
+          type: string
+
+    ListUser:
+      type: object
+      required:
+        - items
+        - size
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        size:
+          type: integer
+          format: int64
+
+    LoginOk:
+      required:
+        - companyId
+        - email
+        - name
+        - nicknames
+        - roleType
+        - userId
+        - status
+      type: object
+      additionalProperties: false
+      properties:
+        userId:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        roleType:
+          type: string
+
+        name:
+          type: string
+        nicknames:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: boolean
+    UpdatePassword:
+      type: object
+      required:
+        - newPassword
+
+      additionalProperties: false
+      properties:
+        newPassword:
+          type: string
+
+    FogoutPassword:
+      type: object
+      required:
+        - newPassword
+        - email
+      additionalProperties: false
+      properties:
+        newPassword:
+          type: string
+        email:
+          type: string
+          format: email
+    StatusUser:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - code
+      properties:
+        status:
+          type: string
+        code:
+          type: integer
+          format: int64
+
+    Device:
+      required:
+        - companyId
+        - deviceId
+        - deviceName
+        - userId
+      type: object
+      additionalProperties: false
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        deviceName:
+          type: string
+          example: ffffff100000c845
+
+    UpdateDevice:
+      required:
+        - companyId
+        - deviceName
+        - userId
+      type: object
+      additionalProperties: false
+      properties:
+        userId:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        deviceName:
+          type: string
+          example: ffffff100000c845
+
+    FindDeviceByName:
+      required:
+        - companyId
+        - userId
+        - deviceName
+        - humility
+        - receivedAt
+        - temperature
+        - batery
+      type: object
+      additionalProperties: false
+      properties:
+        companyId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        receivedAt:
+          type: string
+          format: date-time
+        deviceName:
+          type: string
+          example: ffffff100000c845
+        temperature:
+          type: number
+          example: 26.3
+        humility:
+          type: number
+          example: 26.3
+        batery:
+          type: integer
+          format: int64
+          example: 58
+
+    Operation:
+      type: object
+      required:
+        - operationName
+        - value
+      additionalProperties: false
+      properties:
+        operationName:
+          type: string
+        value:
+          type: integer
+          format: int64
+
+
+    CompanyDeviceList:
+      type: object
+      required:
+        - items
+        - size
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindDeviceByName'
+        size:
+          type: integer
+          format: int64
+    Task:
+      required:
+        - userId
+        - deviceName
+        - email
+        - taskName
+        - condition
+        - valueConditional
+
+      type: object
+      additionalProperties: false
+      properties:
+        userId:
+          type: string
+          format: uuid
+        deviceName:
+          type: string
+          example: ffffff100000c845
+        email:
+          type: string
+          format: email
+        taskName:
+          type: string
+          example: high temperature level
+        condition:
+          type: string
+          example: ">=40"
+        valueConditional:
+          type: number
+          format: float
+          example: 22.5
+
+    updateTask:
+      required:
+        - taskName
+        - condition
+        - valueConditional
+      type: object
+      additionalProperties: false
+      properties:
+        taskName:
+          type: string
+          example: high temperature level
+        condition:
+          type: string
+          example: ">=45"
+        valueConditional:
+          type: number
+          format: float
+          example: 25.5
+
+    ListTasks:
+      required:
+        - items
+        - size
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        size:
+          type: integer
+          format: int64
+    Alert:
+      type: object
+      additionalProperties: false
+      required:
+        - userId
+        - deviceName
+        - subject
+        - body
+        - sendAt
+      properties:
+        userId:
+          type: string
+          format: uuid
+        deviceName:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        sendAt:
+          type: string
+          format: date-time
+
+    AlertList:
+      type: object
+      required:
+        - items
+        - size
+      additionalProperties: false
+      properties:
+        items:
+          $ref: '#/components/schemas/Alert'
+        size:
+          type: integer
+          format: int64
+
