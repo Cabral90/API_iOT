@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: OpenApi3 iOT ChirpStack
+  title: iOT ChirpStack
   description: >-
     OpenApi3 iOT ChirpStack Server, user data management and interaction API and
     integrated device humidity and temperature sensor.
@@ -42,12 +42,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Company'
+              $ref: '#/components/schemas/CreateCompany'
         required: true
       responses:
-        default:
+        '200':
           description: successful operation
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
       x-codegen-request-body-name: body
     put:
       tags:
@@ -147,7 +150,6 @@ paths:
         '404':
           description: Company not found
           content: {}
-
   /users:
     post:
       tags:
@@ -159,13 +161,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/CreateUser'
         required: true
+        x-codegen-request-body-name: body
       responses:
-        default:
+        '200':
           description: successful operation
-          content: {}
-      x-codegen-request-body-name: body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+
     put:
       tags:
         - user
@@ -209,7 +216,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListUser'
+                $ref: '#/components/schemas/AllUser'
         '400':
           description: Invalid ID supplied
           content: {}
@@ -237,7 +244,6 @@ paths:
           description: User not found
           content: {}
 
-
   '/users/{userId}':
     get:
       tags:
@@ -259,7 +265,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/ListUser'
         '400':
           description: Invalid ID supplied
           content: {}
@@ -309,7 +315,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ForgetPassword'
+              $ref: '#/components/schemas/FogoutPassword'
         required: true
       responses:
         default:
@@ -414,37 +420,8 @@ paths:
           description: successful operation
           content: {}
       x-codegen-request-body-name: body
-    put:
-      tags:
-        - task
-      summary: Update an existing Task
-      operationId: updateTask
-      parameters:
-        - name: taskId
-          in: query
-          description: The ID for Task
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        description: Task object that fdefinition for user
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/updateTask'
-        required: true
-      responses:
-        '400':
-          description: Invalid ID supplied
-          content: {}
-        '404':
-          description: Task not found
-          content: {}
-        '405':
-          description: Validation exception
-          content: {}
-      x-codegen-request-body-name: body
+
+
     delete:
       tags:
         - task
@@ -484,6 +461,7 @@ paths:
         '404':
           description: Task not found
           content: {}
+
   '/tasks/{taskId}':
     get:
       tags:
@@ -512,10 +490,42 @@ paths:
         '404':
           description: Task not found
           content: {}
+
+    put:
+      tags:
+        - task
+      summary: Update an existing Task
+      operationId: updateTask
+      parameters:
+        - name: taskId
+          in: path
+          description: The ID for Task
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Task object that fdefinition for user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateTask'
+        required: true
+      responses:
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Task not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
   '/users/{userId}/tasks':
     get:
       tags:
-        - task
+        - user
       summary: Get all Task by ID User
       description: Returns all single Task
       operationId: getTaskByIdUser
@@ -596,6 +606,13 @@ paths:
       summary: Get all Devices
       description: Returns all Device
       operationId: getAllDevice
+      parameters:
+        - name: name
+          in: query
+          description: ID of device to return
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: successful operation
@@ -647,44 +664,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Device'
+                $ref: '#/components/schemas/FindDevice'
         '400':
           description: Invalid ID supplied
           content: {}
         '404':
           description: Device not found
           content: {}
-  '/devices/{name}':
-    get:
-      tags:
-        - device
-      summary: Get Device by Name
-      description: Returns a single Device
-      operationId: getDeviceByName
-      parameters:
-        - name: name
-          in: path
-          description: ID of device to return
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FindDeviceByName'
-        '400':
-          description: Invalid ID supplied
-          content: {}
-        '404':
-          description: Name not found
-          content: {}
+
   '/users/{userId}/devices':
     get:
       tags:
-        - device
+        - user
       summary: Get all devices by ID User
       description: Returns array Device
       operationId: getAllDeviceByIdUser
@@ -712,7 +703,7 @@ paths:
   '/comapanies/{companyId}/devices':
     get:
       tags:
-        - device
+        - company
       summary: Get all devices by ID Company
       description: Returns array Device
       operationId: getAllDeviceByIdCompany
@@ -738,13 +729,13 @@ paths:
           description: Device not found
           content: {}
 
-  '/comapanies/{companyId}/avg-temperature':
+  '/comapanies/{companyId}/users':
     get:
       tags:
-        - device
-      summary: Get AVG temperature all device by ID Company
-      description: Get AVG temperature by ID Company
-      operationId: getAllAvgTemperatureByCompany
+        - company
+      summary: Get all User by ID Company
+      description: Returns array Device
+      operationId: getAllUserByIdCompany
       parameters:
         - name: companyId
           in: path
@@ -759,7 +750,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Operation'
+                $ref: '#/components/schemas/AllUser'
         '400':
           description: Invalid ID supplied
           content: {}
@@ -767,23 +758,26 @@ paths:
           description: Device not found
           content: {}
 
-
-
-  '/comapanies/{companyId}/avg-humidities':
+  '/entities/{entityId}/avg-temperature':
     get:
       tags:
-        - device
-      summary: Get AVG humidity all device by ID Company
-      description: Get AVG humidity by ID Company
-      operationId: getAllAvgHumidityByCompany
+        - operation
+      summary: Get AVG temperature all device by ID Entities
+      description: Get AVG temperature by ID Entities
+      operationId: getAllAvgTemperatureByEntities
       parameters:
-        - name: companyId
+        - name: entityId
           in: path
           description: ID of device to return
           required: true
           schema:
             type: string
             format: uuid
+        - name: entityName
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: successful operation
@@ -798,78 +792,26 @@ paths:
           description: Device not found
           content: {}
 
-  '/comapanies/{companyId}/sum-devices':
+  '/entities/{entityId}/avg-humidities':
     get:
       tags:
-        - device
-      summary: Get SUM all device by ID Company
-      description: Get AVG temperature by ID Company
-      operationId: getSumDiviceByCompany
-      parameters:
-        - name: companyId
-          in: path
-          description: ID of device to return
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Operation'
-        '400':
-          description: Invalid ID supplied
-          content: {}
-        '404':
-          description: Device not found
-          content: {}
-
-  '/users/{userId}/avg-temperatures':
-    get:
-      tags:
-        - device
-      summary: Get AVG device by ID User
-      description: Get SUM device by ID User
-      operationId: getSumByIdUser
-      parameters:
-        - name: userId
-          in: path
-          description: ID of device to return
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Operation'
-        '400':
-          description: Invalid ID supplied
-          content: {}
-        '404':
-          description: Device not found
-          content: {}
-  '/users/{userId}/avg-humidities':
-    get:
-      tags:
-        - device
-      summary: Get AVG humidity by ID User
-      description: Get SUM humidity by ID Company
+        - operation
+      summary: Get AVG humidity by ID Entities
+      description: Get SUM humidity by ID Entities
       operationId: sumHumidityByCompany
       parameters:
-        - name: userId
+        - name: entityId
           in: path
           description: ID of device to return
           required: true
           schema:
             type: string
             format: uuid
+        - name: entityName
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: successful operation
@@ -883,15 +825,16 @@ paths:
         '404':
           description: Device not found
           content: {}
-  '/users/{userId}/sum-devices':
+
+  '/entities/{entityId}/sum-devices':
     get:
       tags:
-        - device
-      summary: Get SUM all device by ID User
+        - operation
+      summary: Get SUM all device by ID Entities
       description: Get AVG temperature by ID Company
       operationId: getSumDiviceByUser
       parameters:
-        - name: userId
+        - name: entityId
           in: path
           description: ID of device to return
           required: true
@@ -911,6 +854,245 @@ paths:
         '404':
           description: Device not found
           content: {}
+
+  '/entities/{entityId}/limit-devices':
+    get:
+      tags:
+        - operation
+      summary: Get device by delimiter
+      description: Get device by delimiter
+      operationId: getDiviceByLimit
+      parameters:
+        - name: entityId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: entityName
+          in: query
+          required: true
+          schema:
+            type: string
+
+        - name: limit
+          in: query
+          description: value limiter to search
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/entities/{entityId}/asc-devices':
+    get:
+      tags:
+        - operation
+      summary: Order ASC device by ID Entities
+      description: Order ASC device
+      operationId: getDiviceByAsc
+      parameters:
+        - name: entityId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+        - name: entityName
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: value limiter to search
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/entities/{entitiesId}/desc-devices':
+    get:
+      tags:
+        - operation
+      summary: Order DESC device by ID Entities
+      description: Order ASC device
+      operationId: getDiviceByDesc
+      parameters:
+        - name: entitiesId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: value limiter to search
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/entities/{entityId}/incidence':
+    get:
+      tags:
+        - operation
+      summary: Get all incidence device by ID Entities
+      description: Order ASC device
+      operationId: getIncidenceByDesc
+      parameters:
+        - name: entityId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+        - name: entityName
+          in: query
+          required: true
+          schema:
+            type: string
+
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListIncidence'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/entities/{entityId}/export-file':
+    get:
+      tags:
+        - operation
+      summary: Export data in to file
+      description: Export file
+      operationId: exportFile
+      parameters:
+        - name: entityId
+          in: path
+          description: ID of device to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: entityName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListIncidence'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/entities/filter-devices':
+    put:
+      tags:
+        - operation
+      summary: Filter a user's devices by ID
+      description: find a user's device input value
+      operationId: filterDeviceUser
+      requestBody:
+        $ref: '#/components/requestBodies/FilterDeiveBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDeviceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/entities/filter-date-devices':
+    put:
+      tags:
+        - operation
+      summary: Filter data by date
+      description: ''
+      operationId: filterDateDeviceUser
+      requestBody:
+        $ref: '#/components/requestBodies/FilterDateDeiveBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindDevice'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
 
   /alerts:
     get:
@@ -934,42 +1116,15 @@ paths:
           content: {}
 
 
-  '/devices/{name}/alerts':
+  '/alerts/{alertId}':
     get:
       tags:
         - alert
-      summary: Get Alert by Name Device
-      description: Returns a single Alert
-      operationId: getAlertByName
+      summary: Get all Alert by ID Alert
+      description: Returns all  Alert Alert
+      operationId: getAlertByIdAlert
       parameters:
-        - name: name
-          in: path
-          description: Name of device to return
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Alert'
-        '400':
-          description: Invalid ID supplied
-          content: {}
-        '404':
-          description: Name not found
-          content: {}
-  '/users/{userId}/alerts':
-    get:
-      tags:
-        - alert
-      summary: Get all Alert by ID User
-      description: Returns all  Alert User
-      operationId: getAlertByIdUser
-      parameters:
-        - name: userId
+        - name: alertId
           in: path
           description: ID of User to return
           required: true
@@ -988,8 +1143,107 @@ paths:
         '404':
           description: ID not found
           content: {}
+
+  '/entities/{entityId}/alerts':
+    get:
+      tags:
+        - alert
+      summary: Get all Alert by ID Entities
+      description: Returns all  Alert Entities
+      operationId: getAlertByIdEntities
+      parameters:
+        - name: entityId
+          in: path
+          description: ID of User to return
+          required: true
+          schema:
+            type: string
+        - name: entityName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: ID not found
+          content: {}
+
+
+
 components:
+  parameters:
+    companyId:
+      in: path
+      name: companyId
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    filter:
+      in: header
+      name: filterValue
+      required: true
+      schema:
+        $ref: '#/components/schemas/Filter'
+
+  requestBodies:
+    FilterDeiveBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              items:
+                $ref: '#/components/schemas/FilterDevice'
+
+    FilterDateDeiveBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FilterDateDevice'
+
   schemas:
+
+    CreateCompany:
+      required:
+        - address
+        - codePostal
+        - companyName
+        - email
+        - nif
+        - phone
+        - web
+      type: object
+      additionalProperties: false
+      properties:
+        companyName:
+          type: string
+        nif:
+          type: string
+        address:
+          type: string
+        codePostal:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        web:
+          type: string
     Company:
       required:
         - address
@@ -1050,14 +1304,38 @@ components:
       type: object
       additionalProperties: false
       properties:
+        size:
+          type: integer
+          format: int64
         items:
           type: array
           items:
             $ref: '#/components/schemas/Company'
-        size:
-          type: integer
-          format: int64
 
+    CreateUser:
+      required:
+        - companyName
+        - email
+        - name
+        - nicknames
+        - password
+        - role
+      type: object
+      additionalProperties: false
+      properties:
+        role:
+          type: string
+        companyName:
+          type: string
+        name:
+          type: string
+        nicknames:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+          format: password
     User:
       required:
         - companyId
@@ -1067,6 +1345,7 @@ components:
         - password
         - roleId
         - userId
+        - totalDevice
       type: object
       additionalProperties: false
       properties:
@@ -1088,42 +1367,66 @@ components:
         password:
           type: string
           format: password
+        totalDevice:
+          type: integer
+          format: int64
 
-    UpdateUser:
+
+    ListUser:
       required:
-        - companyId
+        - companyName
+        - email
         - name
         - nicknames
-        - roleId
-        - userId
+        - role
+        - totalDevice
       type: object
       additionalProperties: false
       properties:
-        roleId:
+
+        companyName:
           type: string
-          format: uuid
-        companyId:
+        role:
           type: string
-          format: uuid
+        name:
+          type: string
+        nicknames:
+          type: string
+        email:
+          type: string
+        totalDevice:
+          type: integer
+          format: int64
+
+    UpdateUser:
+      required:
+        - name
+        - nicknames
+        - role
+      type: object
+      additionalProperties: false
+      properties:
+        role:
+          type: string
         name:
           type: string
         nicknames:
           type: string
 
-    ListUser:
+    AllUser:
       type: object
       required:
         - items
         - size
       additionalProperties: false
       properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
         size:
           type: integer
           format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListUser'
 
     LoginOk:
       required:
@@ -1168,12 +1471,9 @@ components:
     FogoutPassword:
       type: object
       required:
-        - newPassword
         - email
       additionalProperties: false
       properties:
-        newPassword:
-          type: string
         email:
           type: string
           format: email
@@ -1193,15 +1493,12 @@ components:
     Device:
       required:
         - companyId
-        - deviceId
         - deviceName
         - userId
       type: object
       additionalProperties: false
       properties:
-        deviceId:
-          type: string
-          format: uuid
+
         userId:
           type: string
           format: uuid
@@ -1230,30 +1527,29 @@ components:
           type: string
           example: ffffff100000c845
 
-    FindDeviceByName:
+    FindDevice:
       required:
-        - companyId
-        - userId
+        - companyName
+        - userName
+        - role
         - deviceName
         - humility
-        - receivedAt
         - temperature
         - batery
+        - status
       type: object
       additionalProperties: false
       properties:
-        companyId:
+        companyName:
           type: string
-          format: uuid
-        userId:
-          type: string
-          format: uuid
-        receivedAt:
-          type: string
-          format: date-time
         deviceName:
           type: string
           example: ffffff100000c845
+        userName:
+          type: string
+        role:
+          type: string
+
         temperature:
           type: number
           example: 26.3
@@ -1264,19 +1560,32 @@ components:
           type: integer
           format: int64
           example: 58
+        status:
+          type: string
+          example: on
 
     Operation:
       type: object
       required:
         - operationName
+        - description
+        - entityName
         - value
       additionalProperties: false
       properties:
         operationName:
           type: string
+          example: Name operation
+        description:
+          type: string
+          example: Description about this function
+        entityName:
+          type: string
+          example: Name of Entities (User, Company)
         value:
           type: integer
           format: int64
+          example: 22
 
 
     CompanyDeviceList:
@@ -1286,31 +1595,36 @@ components:
         - size
       additionalProperties: false
       properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/FindDeviceByName'
+
         size:
           type: integer
           format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindDevice'
+
     Task:
       required:
-        - userId
+        - userName
         - deviceName
+        - type
         - email
         - taskName
         - condition
-        - valueConditional
+        - conditionalValue
 
       type: object
       additionalProperties: false
       properties:
-        userId:
+        userName:
           type: string
-          format: uuid
         deviceName:
           type: string
           example: ffffff100000c845
+        type:
+          type: string
+          example: temperature
         email:
           type: string
           format: email
@@ -1319,8 +1633,8 @@ components:
           example: high temperature level
         condition:
           type: string
-          example: ">=40"
-        valueConditional:
+          example: ">="
+        conditionalValue:
           type: number
           format: float
           example: 22.5
@@ -1338,7 +1652,7 @@ components:
           example: high temperature level
         condition:
           type: string
-          example: ">=45"
+          example: ">="
         valueConditional:
           type: number
           format: float
@@ -1351,35 +1665,162 @@ components:
       type: object
       additionalProperties: false
       properties:
+        size:
+          type: integer
+          format: int64
         items:
           type: array
           items:
             $ref: '#/components/schemas/Task'
-        size:
-          type: integer
-          format: int64
+
     Alert:
       type: object
       additionalProperties: false
       required:
-        - userId
+        - userName
         - deviceName
-        - subject
-        - body
-        - sendAt
+        - alertName
+        - recivedAt
+        - hour
+        - condition
+        - conditionalValuer
+        - currentValue
       properties:
+        userName:
+          type: string
+          example: User
+        deviceName:
+          type: string
+          example: ffffff100000c845
+        alertName:
+          type: string
+          example: High temperature
+        recivedAt:
+          type: string
+          format: date
+        hour:
+          type: string
+          format: time
+          example: '20:30'
+        condition:
+          type: string
+          example: '=>'
+        conditionalValuer:
+          type: number
+          example: 35
+        currentValue:
+          type: integer
+          format: int64
+
+
+    FilterDevice:
+      type: object
+      additionalProperties: false
+      required:
+        - entityId
+        - entityName
+        - columnName
+        - value
+      properties:
+        entityId:
+          type: string
+          format: uuid
+        entityName:
+          type: string
+        columnName:
+          type: string
+        value:
+          type: string
+
+    FilterDateDevice:
+      type: object
+      additionalProperties: false
+      required:
+        - entityId
+        - entityName
+        - to
+        - from
+      properties:
+        entityId:
+          type: string
+          format: uuid
+        entityName:
+          type: string
+        to:
+          type: string
+          format: date
+        from:
+          type: string
+          format: date
+
+    Filter:
+      type: object
+      additionalProperties: false
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterDevice'
+
+
+    Incidence:
+      type: object
+      additionalProperties: false
+      required:
+        - deviceId
+        - userId
+        - companyId
+        - deviceName
+        - date
+        - recivedAt
+        - valuecConditional
+        - value
+        - timeDuration
+      properties:
+        deviceId:
+          type: string
+          format: uuid
         userId:
+          type: string
+          format: uuid
+        companyId:
           type: string
           format: uuid
         deviceName:
           type: string
-        subject:
+          example: ffffff100000c845
+        date:
           type: string
-        body:
+          format: date
+        recivedAt:
           type: string
-        sendAt:
+          format: hour
+          example: 00:30
+        valuecConditional:
           type: string
-          format: date-time
+          example: ">50"
+        value:
+          type: string
+        timeDuration:
+          type: string
+          format: hour
+          example: 02:30
+
+
+    ListIncidence:
+      type: object
+      required:
+        - incidence
+        - size
+      additionalProperties: false
+      properties:
+        size:
+          type: integer
+          format: int64
+        incidence:
+          $ref: '#/components/schemas/Incidence'
 
     AlertList:
       type: object
@@ -1388,9 +1829,10 @@ components:
         - size
       additionalProperties: false
       properties:
-        items:
-          $ref: '#/components/schemas/Alert'
         size:
           type: integer
           format: int64
+        items:
+          $ref: '#/components/schemas/Alert'
+
 
