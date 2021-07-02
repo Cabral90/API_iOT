@@ -56,17 +56,6 @@
         <version>${vertx.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-web-validation</artifactId>
-        <version>${vertx.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-web-openapi</artifactId>
-        <version>${vertx.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>io.vertx</groupId>
@@ -112,6 +101,18 @@
         <version>${vertx.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-codegen</artifactId>
+        <version>${vertx.version}</version>
+        <classifier>processor</classifier>
+      </dependency>
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-sql-client-templates</artifactId>
+        <version>${vertx.version}</version>
+      </dependency>
+
     </dependencies>
 
     <build>
@@ -137,6 +138,16 @@
             <target>10</target>
           </configuration>
         </plugin>
+
+<!--        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <annotationProcessors>
+              <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
+            </annotationProcessors>
+          </configuration>
+        </plugin>-->
+
       </plugins>
     </build>
 

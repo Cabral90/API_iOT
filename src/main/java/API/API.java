@@ -7,34 +7,16 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.openapi.RouterBuilder;
-import io.vertx.ext.web.sstore.LocalSessionStore;
-import io.vertx.ext.web.validation.BadRequestException;
-import io.vertx.ext.web.validation.RequestParameters;
-import io.vertx.ext.web.validation.ValidationHandler;
-import io.vertx.ext.web.validation.builder.Bodies;
-import io.vertx.ext.web.validation.builder.Parameters;
-import io.vertx.json.schema.Schema;
-import io.vertx.json.schema.SchemaParser;
-import io.vertx.json.schema.SchemaRouter;
-import io.vertx.json.schema.SchemaRouterOptions;
-import io.vertx.json.schema.common.dsl.ObjectSchemaBuilder;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.*;
 
-
-import javax.print.attribute.standard.JobStateReasons;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static API.CreateOject.Task;
+import static API.createObject.getTask;
 import static API.ValidateData.*;
-import static io.vertx.ext.web.validation.builder.Bodies.formUrlEncoded;
-import static io.vertx.ext.web.validation.builder.Bodies.json;
-import static io.vertx.ext.web.validation.builder.Parameters.param;
-import static io.vertx.json.schema.common.dsl.Schemas.*;
 
 
 public class API extends AbstractVerticle {
@@ -43,6 +25,8 @@ public class API extends AbstractVerticle {
 
   private PgPool pool;
   private Router router;
+  private static final UUID getUUID = UUID.randomUUID();
+  private ValidateData validar = null;
 
   public static void main(String[] args) {
 
@@ -56,9 +40,12 @@ public class API extends AbstractVerticle {
 
   public void start() { // Promise<Void> startPromise
 
+    validar = new ValidateData();
+
 
     System.out.println(" Init.....");
     clientDB()
+
       .compose(this::setUpInitialData);
 
     System.out.println(" Init.....");
@@ -74,6 +61,11 @@ public class API extends AbstractVerticle {
         System.out.println(" Init3 call function .....");
 
         // call all endpoints
+        // TODO: comprobar si hay sessione primero. caso contrario no se hara ningua operacion
+   /*     this.haveSession()
+          .compose(this::allFunction)
+        .onFailure( " message error login");*/
+
         allFunction(routerBuilder);
 
         //Router router = Router.router(vertx)
@@ -103,7 +95,8 @@ public class API extends AbstractVerticle {
     router.operation("deleteCompany").handler(this::deleteCompany);
     router.operation("getAllCompany").handler(this::getAllCompany);
     router.operation("getCompanyById").handler(this::getCompanyById);
-
+    router.operation("getAllDeviceByIdCompany").handler(this::getAllDeviceByIdCompany);
+    router.operation("getAllDeviceByIdCompany").handler(this::getAllUserByIdCompany);
 
     // CRUD User
     router.operation("createUser").handler(this::createUser);
@@ -111,10 +104,12 @@ public class API extends AbstractVerticle {
     router.operation("deleteUser").handler(this::deleteUser);
     router.operation("getAllUser").handler(this::getAllUser);
     router.operation("getUserById").handler(this::getUserById);
+    router.operation("getTaskByIdUser").handler(this::getTaskByIdUser);
+    router.operation("getUserById").handler(this::getAllDeviceByIdUser);
 
-    // pass User
-    router.operation("recoverPassword").handler(this::recoverPassword);
-    //router.operation("updatePassword").handler(this::updatePassword);
+    // pass User forget
+    router.operation("forgetPassword").handler(this::recoverPassword);
+    router.operation("updatePassword").handler(this::updatePassword);
 
 
     // Session
@@ -128,20 +123,26 @@ public class API extends AbstractVerticle {
     router.operation("deleteDevice").handler(this::deleteDevice);
     router.operation("getAllDevice").handler(this::getAllDevice);
     router.operation("getDeviceById").handler(this::getDeviceById);
-    router.operation("getDeviceByName").handler(this::getDeviceByName);
-    router.operation("getAllDeviceByIdCompany").handler(this::getAllDeviceByIdCompany);
+
     router.operation("getAllDeviceByIdUser").handler(this::getAllDeviceByIdUser);
 
     // Alert
     router.operation("getAllAlert").handler(this::getAllAlert);
-    router.operation("getAlertByName").handler(this::getAlertByName);
-    router.operation("getAlertByIdUser").handler(this::getAlertByIdUser);
+    router.operation("getAlertById").handler(this::getAlertById);
+    router.operation("getAlertByIdEntities").handler(this::getAlertByIdEntities);
 
     // operations
-    /*router.operation("getAlertByIdUser").handler(this::"getAlertByIdUser");
-    router.operation("getAlertByIdUser").handler(this::"getAlertByIdUser");
-    router.operation("getAlertByIdUser").handler(this::"getAlertByIdUser");
-    router.operation("getAlertByIdUser").handler(this::"getAlertByIdUser");*/
+    router.operation("getAvgTemperatureByIdEntity").handler(this::getAvgTemperatureByIdEntity);
+    router.operation("getAvgHumidityByIdEntity").handler(this::getAvgHumidityByIdEntity);
+    router.operation("getSumDevicesSumByIdEntity").handler(this::getSumDevicesSumByIdEntity);
+    router.operation("getDevicesDelimiterByIdEntity").handler(this::getDevicesDelimiterByIdEntity);
+    router.operation("getDevicesOrderAscByIdEntity").handler(this::getDevicesOrderAscByIdEntity);
+    router.operation("getDevicesOrderDescByIdEntity").handler(this::getDevicesOrderDescByIdEntity);
+    router.operation("getDevicesIncidenceByIdEntity").handler(this::getDevicesIncidenceByIdEntity);
+    router.operation("exportFileByIdEntity").handler(this::exportFileByIdEntity);
+
+    router.operation("filterDevicesByIdEntity").handler(this::filterDevicesByIdEntity);
+    router.operation("filterDevicesDateByIdEntity").handler(this::filterDevicesDateByIdEntity);
 
     // Task
     router.operation("createTask").handler(this::createTask);
@@ -158,7 +159,7 @@ public class API extends AbstractVerticle {
 
   private void createCompany(RoutingContext routingContext) {
 
-
+    //haveRegistre(pool, "47aa84c6-7ae8-49bd-8b72-bca82efb87e5", "id", "app_chirpstack_user.company ");
     // The object body request.
     JsonObject company = routingContext.getBodyAsJson();
 
@@ -169,15 +170,117 @@ public class API extends AbstractVerticle {
     System.out.println("Imprimimos el contenido enviado");
     System.out.println(company.encodePrettily());
 
+    UUID id = getUUID;
+
     // sql
     String sqlCompany = "INSERT INTO app_chirpstack_user.company "
-      + " (company_id, company_name, NIF, address, code_postal, phone, email, web)"
-      + " VALUES ($1, $2, $3, $4, $5, $6, $7, $8 ) ";
-    String findCompany = "SELECT * FROM app_chirpstack_user.company WHERE company_id =  '" + companyId + "' ";
+      + " (id, company_name, NIF, address, code_postal, phone, email, web)"
+      + " VALUES ( '" + id + "', '" + company.getString("companyName") + "', " +
+      " '" + company.getString("nif") + "', '" + company.getString("address") + "', " +
+      " '" + company.getString("codePostal") + "', '" + company.getString("phone") + "', " +
+      " '" + company.getString("email") + "', '" + company.getString("web") + "' ) ";
 
-    System.out.println("Query find company: " + findCompany);
+    String findCompany = "SELECT * FROM app_chirpstack_user.company WHERE id =  '" + id + "' ";
+    System.out.println("query: " + sqlCompany);
 
-    pool.preparedQuery(findCompany) // verified if exist a similar company
+    String sql = "SELECT * FROM app_chirpstack_user.company WHERE id =  '47aa84c6-7ae8-49bd-8b72-bca82efb87e5'  ";
+
+    System.out.println("Query find company: " + sql);
+
+    JsonObject thisCompany = new JsonObject();
+
+      pool
+        .getConnection()
+        .compose(conn -> conn
+          .query(sql)
+          .execute()
+          .flatMap(res -> {
+
+            System.out.println("hay datos: " + !res.next().iterator().hasNext());
+            System.out.println("hay datos2: " + !res.iterator().hasNext());
+            if (!res.iterator().hasNext()) {
+              return Future.succeededFuture(false);
+            } else {
+              return Future.succeededFuture(true);
+            }
+
+
+          }).onSuccess(v -> {
+            System.out.println(" estado: "+ v);
+          }).onFailure(err -> {
+            System.out.println(err.getMessage());
+          })
+        );
+
+
+    /*pool
+      .getConnection()
+      .onSuccess(conn -> {
+        conn
+          .begin()
+          .compose(tx -> conn
+              .query(sql)
+              .execute()
+              .onSuccess(ros -> {
+
+                System.out.println("create company ok");
+                //System.out.println(ros.iterator().next().toJson().encodePrettily());
+
+                System.out.println(" hay datos: " + !ros.iterator().hasNext());
+                if (!ros.iterator().hasNext()) {
+
+                  pool.query(sqlCompany)
+                    .execute()
+                    .compose(res2 -> conn
+                      .query(findCompany)
+                      .execute()
+                      .map(rest ->
+                        rest.iterator().next().toJson()))
+                    *//*           .compose( res3 ->
+                                 tx.commit()
+                               )*//*
+                    .eventually(v -> conn.close())
+                    .onSuccess(v -> {
+                      System.out.println(v.encodePrettily());
+                    })
+                    .onFailure(err -> System.out.println(err.getMessage()));
+                }
+
+              })
+              .onFailure(err ->
+                //System.out.println(err.fillInStackTrace())
+                System.out.println(err.toString())
+              )*/
+
+/*
+            .onSuccess(arg ->
+              System.out.println(arg.iterator().next(). toJson())
+            ).onFailure(err ->
+              //err.getCause().printStackTrace()
+              System.out.println("error")
+            )
+
+           .compose(res1 -> conn
+              .query(findCompany)
+              .execute())
+            //.compose( res3 -> tx.commit())
+            .onSuccess(ros2 -> {
+
+              System.out.println(" to print a object create");
+              thisCompany.put("Company", ros2.iterator().next().toJson());
+              System.out.println(ros2.iterator().next().toJson().encodePrettily());
+              routingContext.response().putHeader("content-type", "application/json").end(thisCompany.encode());
+            })
+            .eventually(v -> conn.close())
+            .onFailure(err -> {
+              err.getCause().fillInStackTrace();
+            })*/
+
+   /*       );
+  });
+*/
+
+    /*pool.preparedQuery(findCompany) // verified if exist a similar company
       .execute(find -> {
         if (find.succeeded()) {
           int size = find.result().rowCount();
@@ -186,16 +289,7 @@ public class API extends AbstractVerticle {
             System.out.println("create a company");
 
             pool.preparedQuery(sqlCompany)
-              .execute(Tuple.of(
-                company.getString("companyId"),
-                company.getString("companyName"),
-                company.getString("nif"),
-                company.getString("address"),
-                company.getString("codePostal"),
-                company.getString("phone"),
-                company.getString("email"),
-                company.getString("web")
-              ), ar -> {
+              .execute( ar -> {
                 if (ar.succeeded()) {
                   RowSet<Row> rows = ar.result();
                   System.out.println(rows.rowCount());
@@ -235,10 +329,10 @@ public class API extends AbstractVerticle {
           this.router.errorHandler(400, rc -> sendError(rc, 400, rc.failure().getMessage()));
           find.cause().printStackTrace();
         }
-      });
+      });*/
 
 
-  }
+}
 
   private void updateCompany(RoutingContext routingContext) {
     response = routingContext.response();
@@ -369,6 +463,7 @@ public class API extends AbstractVerticle {
           // routingContext.fail(500);
 
           //sendError(404, response, "Companies not found");
+          routingContext.response().setStatusCode(404).end("Not found Company");
         } else {
           for (Row row : ar.result()) {
             companies.add(new JsonObject().put("items", row.toJson()));
@@ -388,6 +483,7 @@ public class API extends AbstractVerticle {
 
     response = routingContext.response();
     String companyId = routingContext.request().getParam("companyId"); // only value
+
 
     String findCompany = "SELECT * FROM app_chirpstack_user.company WHERE company_id = '" + companyId + "' ";
     System.out.println("query delete: " + findCompany);
@@ -411,6 +507,13 @@ public class API extends AbstractVerticle {
       });
   }
 
+  private void getAllUserByIdCompany(RoutingContext routingContext) {
+
+  }
+
+  private void getAllDeviceByIdCompany(RoutingContext routingContext) {
+
+  }
 
   // =============== CRUD USER ==========
 
@@ -678,41 +781,103 @@ public class API extends AbstractVerticle {
     response = routingContext.response();
 
     System.out.println("USER");
-    //JsonObject company = new JsonObject();
 
-    JsonArray users = new JsonArray();
-    //JsonObject myObc = new JsonObject();
+    int limit = 5;
+    int offset = 0;
 
-    pool.query("SELECT * FROM app_chirpstack_user.user")
-      .execute(ar -> {
+    //System.out.println("permisos: "+
+    //validar.hasPermission(pool, "4bb62696-cd6d-4b93-88c9-4b1b6b12ee45");
+    //validar.getDetailsRole(pool,"4bb62696-cd6d-4b93-88c9-4b1b6b12ee45");
+    //validar.hasPermission(pool, "4bb62696-cd6d-4b93-88c9-4b1b6b12ee45");
+
+    AtomicReference<String> rol = new AtomicReference<>();
+
+    UUID role_idD = null;
+    Tuple t = Tuple.of(limit, offset);
+    pool.preparedQuery("SELECT * FROM app_chirpstack_user.user LIMIT $1 OFFSET $2")
+      .execute(t, ar -> {
+
         if (ar.failed()) {
           // routingContext.fail(500);
 
           sendError2(404, response, "Users not found");
         } else {
+          JsonArray items = new JsonArray();
           for (Row row : ar.result()) {
-            //users.add(new JsonObject().put("items", row.toJson()));
-            users.add(new JsonObject()
-              .put("items", new JsonObject()
+
+            String roll = String.valueOf(row.getUUID("role_id"));
+
+            items.add(
+
+              //row.toJson()
+              new JsonObject()
                 .put("userId", row.getUUID("id"))
-                .put("roleId", row.getUUID("role_id"))
                 .put("companyId", row.getUUID("company_id"))
+                .put("role", "") // TODO : future not resolved // validar.getDetailsRole(pool, row.getUUID("role_id").toString()
+                //.put("role2", row.getUUID("role_id"))
                 .put("name", row.getString("name"))
                 .put("nicknames", row.getString("nicknames"))
                 .put("email", row.getString("email"))
-                .put("password", row.getString("password"))
+                .put("createAt", row.getOffsetDateTime("create_at").toInstant())
+                .put("totalDevice", "0") // TODO : contar los dispositivos que tene un usuario // validar.getCountDeviceUser(pool, row.getUUID("id"))
 
-              ));
+
+            );
+
           }
-          users.add(new JsonObject().put("size", ar.result().rowCount()));
-          routingContext.response().putHeader("content-type", "application/json").end(users.encode());
-          System.out.println(users.encodePrettily());
+
+
+          JsonObject result = new JsonObject()
+            .put("size", ar.result().rowCount()) // TODO consulta de parta para el conteo de registro
+            .put("items", items);
+
+
+          routingContext.response().putHeader("content-type", "application/json").end(result.encode());
+          System.out.println(result.encodePrettily());
         }
 
       });
 
 
   }
+
+  private void getAllDeviceByIdUser(RoutingContext routingContext) {
+  }
+
+  private void getTaskByIdUser(RoutingContext routingContext) {
+
+    System.out.println("all task user ....-> ");
+    String userId = routingContext.request().getParam("userId");
+    String findTaskUser = "SELECT * FROM app_chirpstack_user.task WHERE user_id = '" + userId + "' ";
+
+    System.out.println("query: " + findTaskUser);
+
+    JsonArray allTasks = new JsonArray();
+    pool
+      .query(findTaskUser)
+      .execute(ar -> {
+        if (ar.succeeded()) {
+          int size = ar.result().rowCount();
+          if (size >= 1) {
+            RowSet<Row> result = ar.result();
+            // Row row = result.iterator().next();
+            for (Row row : ar.result()) {
+              allTasks.add(new JsonObject().put("items", getTask(row.toJson())));
+            }
+            allTasks.add(new JsonObject().put("size", ar.result().rowCount()));
+            routingContext.response().putHeader("content-type", "application/json").end(allTasks.encode());
+          } else {
+            routingContext.response().setStatusCode(404).end("Not found task");
+          }
+        } else {
+          routingContext.response().setStatusCode(400).end("Bad RequestDDD");
+        }
+      });
+  }
+
+
+  // Password
+
 
   private void recoverPassword(RoutingContext routingContext) {
 
@@ -838,7 +1003,7 @@ public class API extends AbstractVerticle {
                   User.put("sessionId", sessionId)
                     .put("userId", row.getUUID("id"))
                     .put("companyId", row.getUUID("company_id"))
-                    .put("roleType", getRole(row.getUUID("role_id")))
+                    // .put("roleType", getRole(row.getUUID("role_id")))
                     .put("name", row.getString("name"))
                     .put("nicknames", row.getString("nicknames"))
                     .put("email", row.getString("email"))
@@ -945,15 +1110,6 @@ public class API extends AbstractVerticle {
   private void getDeviceById(RoutingContext routingContext) {
   }
 
-  private void getDeviceByName(RoutingContext routingContext) {
-  }
-
-  private void getAllDeviceByIdCompany(RoutingContext routingContext) {
-  }
-
-  private void getAllDeviceByIdUser(RoutingContext routingContext) {
-  }
-
 
   // ================== CRUD TASK  =============
   private void createTask(RoutingContext routingContext) {
@@ -986,8 +1142,8 @@ public class API extends AbstractVerticle {
                   RowSet<Row> result = ar1.result();
                   Row row = result.iterator().next();
                   //Task(row.toJson());
-                  System.out.println(Task(row.toJson()).encodePrettily());
-                  routingContext.response().putHeader("content-type", "application/json").end(Task(row.toJson()).encode());
+                  System.out.println(getTask(row.toJson()).encodePrettily());
+                  routingContext.response().putHeader("content-type", "application/json").end(getTask(row.toJson()).encode());
                 } else {
                   System.out.println("Not found");
                 }
@@ -1084,7 +1240,7 @@ public class API extends AbstractVerticle {
             RowSet<Row> result = ar.result();
             // Row row = result.iterator().next();
             for (Row row : ar.result()) {
-              allTasks.add(new JsonObject().put("items", Task(row.toJson())));
+              allTasks.add(new JsonObject().put("items", getTask(row.toJson())));
             }
             allTasks.add(new JsonObject().put("size", ar.result().rowCount()));
             routingContext.response().putHeader("content-type", "application/json").end(allTasks.encode());
@@ -1112,9 +1268,9 @@ public class API extends AbstractVerticle {
             RowSet<Row> result = ar.result();
             Row row = result.iterator().next();
 
-            System.out.println(Task(row.toJson()).encodePrettily());
+            System.out.println(getTask(row.toJson()).encodePrettily());
             //Task(row.toJson())
-            routingContext.response().putHeader("content-type", "application/json").end(Task(row.toJson()).encode());
+            routingContext.response().putHeader("content-type", "application/json").end(getTask(row.toJson()).encode());
           } else {
             routingContext.response().setStatusCode(404).end("Not found task");
           }
@@ -1126,37 +1282,6 @@ public class API extends AbstractVerticle {
 
   }
 
-  private void getTaskByIdUser(RoutingContext routingContext) {
-
-    System.out.println("all task user ....-> ");
-    String userId = routingContext.request().getParam("userId");
-    String findTaskUser = "SELECT * FROM app_chirpstack_user.task WHERE user_id = '" + userId + "' ";
-
-    System.out.println("query: "+findTaskUser);
-
-    JsonArray allTasks = new JsonArray();
-    pool
-      .query(findTaskUser)
-      .execute(ar -> {
-        if (ar.succeeded()) {
-          int size = ar.result().rowCount();
-          if (size >= 1) {
-            RowSet<Row> result = ar.result();
-            // Row row = result.iterator().next();
-            for (Row row : ar.result()) {
-              allTasks.add(new JsonObject().put("items", Task(row.toJson())));
-            }
-            allTasks.add(new JsonObject().put("size", ar.result().rowCount()));
-            routingContext.response().putHeader("content-type", "application/json").end(allTasks.encode());
-          } else {
-            routingContext.response().setStatusCode(404).end("Not found task");
-          }
-        } else {
-          routingContext.response().setStatusCode(400).end("Bad RequestDDD");
-        }
-      });
-  }
-
 
   // ================== ALERT LIST ====================================
 
@@ -1165,10 +1290,10 @@ public class API extends AbstractVerticle {
 
   }
 
-  private void getAlertByName(RoutingContext routingContext) {
+  private void getAlertById(RoutingContext routingContext) {
   }
 
-  private void getAlertByIdUser(RoutingContext routingContext) {
+  private void getAlertByIdEntities(RoutingContext routingContext) {
   }
 
 
@@ -1193,6 +1318,38 @@ public class API extends AbstractVerticle {
       .putHeader("Content-Type", "application/json")
       .end(json.toBuffer());
 
+  }
+
+  // operations
+
+  private void exportFileByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void getDevicesIncidenceByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void getDevicesOrderDescByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void filterDevicesDateByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void filterDevicesByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void getDevicesOrderAscByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void getDevicesDelimiterByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void getSumDevicesSumByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void getAvgHumidityByIdEntity(RoutingContext routingContext) {
+  }
+
+  private void getAvgTemperatureByIdEntity(RoutingContext routingContext) {
   }
 
 
@@ -1240,6 +1397,32 @@ public class API extends AbstractVerticle {
   }
 
 
+  public Future<Boolean> haveRegistre(PgPool pool, String id, String colum, String entity) {
+
+    String find = "SELECT * FROM  " + entity + " WHERE " + colum + " = '" + id + "' ";
+    System.out.println("queri METODO: " + find);
+
+    pool
+      .query(find)
+      .execute()
+      .compose(res -> {
+        if (!res.iterator().hasNext()) {
+          System.out.println("Estado: " + !res.iterator().hasNext());
+          return Future.succeededFuture(true);
+
+        }
+        return Future.succeededFuture(false);
+      });
+
+
+    return Future.succeededFuture();
+  }
+
+  public Future<Boolean> haveSession(PgPool pool, UUID id, String colum, String entity) {
+
+
+    return Future.succeededFuture();
+  }
 }
 
 

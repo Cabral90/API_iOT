@@ -14,7 +14,7 @@ CREATE DATABASE chirpstack;
 -- CREATE THE ROLE WITH ITS PERMISSIONS FOR THE "public" SCHEMA
   -- * create role  "public"
   -- * grant privileges connection to database this role
-  -- * alter privileges to public schema and grant only insert 
+  -- * alter privileges to public schema and grant only insert
     -- privilege.
 ----------------------------------------------------------------
 CREATE ROLE chirpstack_server_write;
@@ -27,9 +27,9 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT INSERT ON TABLES TO chirpstack_s
   -- * create role "chirpstack_user_cru"
   -- * grant privileges connection, usage and opetation CRUD to database this role
   -- * create sshema app_chirpstack_user
-  -- * alter privileges to "public" schema and grant only select 
+  -- * alter privileges to "public" schema and grant only select
     -- privilege.
-  -- * alter privileges to "chirpstack_user_cru" schema and grant  
+  -- * alter privileges to "chirpstack_user_cru" schema and grant
     -- privilege CRUD operation.
 ----------------------------------------------------------------
 -- create ROLE READ/WRITE to shema app_chirpstack_user
@@ -58,8 +58,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO chirpstack
 -- GRANT USERS SCHEMA USAGE PRIVILEGES
 -----------------------------------------------------
 -- this user will only insert data for public shema
-GRANT chirpstack_server_write TO chirpstack_server; 
--- this user can do CRUD operation on the app_chirpstack_server 
+GRANT chirpstack_server_write TO chirpstack_server;
+-- this user can do CRUD operation on the app_chirpstack_server
 --  shema and just read on the public shema
 GRANT chirpstack_user_cru TO chirpstack_user; -- operacion CRU en el schema app_chirpstack_user
 
@@ -68,7 +68,7 @@ GRANT chirpstack_user_cru TO chirpstack_user; -- operacion CRU en el schema app_
 ---------------------------------------------------------
 
 CREATE TABLE "app_chirpstack_user".company(
-  id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(), 
+  id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
   create_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   company_name TEXT NOT NULL,
   NIF TEXT NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE "app_chirpstack_user".company(
 CREATE TABLE "app_chirpstack_user".role(
   id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
   type_role TEXT NOT NULL,
-  description TEXT, 
+  description TEXT,
   create_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   update_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
@@ -90,7 +90,7 @@ CREATE TABLE "app_chirpstack_user".role(
 CREATE TABLE "app_chirpstack_user".permission(
   id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
   type_permission TEXT NOT NULL,
-  description TEXT, 
+  description TEXT,
   create_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   update_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
@@ -119,60 +119,76 @@ CREATE TABLE "app_chirpstack_user".user(
     email TEXT NOT NULL,
     password TEXT NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    FOREIGN KEY(company_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE, 
+    FOREIGN KEY(company_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (role_id)REFERENCES "app_chirpstack_user"."role" (id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 CREATE INDEX idx_user_role "app_chirpstack_user".user(role_id ASC);
 
 CREATE TABLE "app_chirpstack_user".session_up(
-    id UUID PRIMARY KEY, 
-    user_id UUID NOT NULL, 
-    company_id UUID NOT NULL, 
-    role_id UUID NOT NULL, 
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    company_id UUID NOT NULL,
+    role_id UUID NOT NULL,
     email TEXT NOT NULL,
     FOREIGN KEY(company_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    FOREIGN KEY(user_id) REFERENCES "app_chirpstack_user".user(id) ON DELETE RESTRICT ON UPDATE CASCADE 
+    FOREIGN KEY(user_id) REFERENCES "app_chirpstack_user".user(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE "app_chirpstack_user".device(
     id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
-    company_id UUID NOT NULL, 
+    company_id UUID NOT NULL,
     create_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     device_name TEXT NOT NULL,
     active BOOLEAN NOT NULL,
-    FOREIGN KEY(company_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE, 
+    FOREIGN KEY(company_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE,
    FOREIGN KEY(user_id) REFERENCES "app_chirpstack_user".user(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-  CREATE TABLE "app_chirpstack_user".alert(
+  CREATE TABLE "app_chirpstack_user".event( -- alert
     id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     device_name TEXT NOT NULL,
-    subject TEXT NOT NULL,
-    body TEXT NOT NULL,
+    conditional TEXT NOT NULL,
+    conditional_Value FLOAT NOT NULL,
+    currentValue FLOAT NOT NULL,
     email TEXT NOT NULL,
-    send_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    create_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+
     FOREIGN KEY(user_id) REFERENCES "app_chirpstack_user".user(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-CREATE TABLE "app_chirpstack_user".task(
+CREATE TABLE "app_chirpstack_user".notification( -- task
     id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     create_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     device_name TEXT NOT NULL,
-    task_name TEXT NOT NULL,
-    condition TEXT NOT NULL, 
+    notify_name TEXT NOT NULL,
+    condition TEXT NOT NULL,
     conditional_value FLOAT NOT NULL,
     email TEXT NOT NULL,
     FOREIGN KEY(user_id) REFERENCES "app_chirpstack_user".user(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
+); --
 
+CREATE TABLE "app_chirpstack_user".incidence(
+  id UUID PRIMARY KEY UNIQUE DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  company_id UUID NOT NULL,
+  device_name TEXT NOT NULL,
+  notify_name TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  condition TEXT NOT NULL,
+  value FLOAT NOT NULL,
+  -- not duration bat will calculete time to recived notified and time actual
+  FOREIGN KEY(user_id) REFERENCES "app_chirpstack_user".user(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  FOREIGN KEY(usecompany_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE
+
+);
 -----------------------------------------------------------
--- CREATE TABLES TO SHEMA public 
+-- CREATE TABLES TO SHEMA public
 -----------------------------------------------------------
--- creamos la tablas para el schema  sch_hirpStack_server-- 
+-- creamos la tablas para el schema  sch_hirpStack_server--
 --/ Tablas obligatoria que recogen los datos de los dispositivos de Servidor [ChirpStack Server] /
 -- CREACION DE TABLAS
 
@@ -295,16 +311,16 @@ CREATE INDEX idx_device_location_tags ON "public".device_location(tags);
 
 
 
--- helpe drop 
+-- helpe drop
 
-drop table 
+drop table
 app_chirpstack_user.alert,
 app_chirpstack_user.company,
-app_chirpstack_user.device, 
-app_chirpstack_user."permission", 
-app_chirpstack_user."role", 
-app_chirpstack_user.role_permission, 
-app_chirpstack_user.session_up, 
-app_chirpstack_user.task, 
+app_chirpstack_user.device,
+app_chirpstack_user."permission",
+app_chirpstack_user."role",
+app_chirpstack_user.role_permission,
+app_chirpstack_user.session_up,
+app_chirpstack_user.task,
 app_chirpstack_user."user"
 
