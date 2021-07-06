@@ -1,0 +1,2226 @@
+openapi: 3.0.0
+info:
+  title: iOT ChirpStack
+  description: >-
+    OpenApi3 iOT ChirpStack Server, user data management and interaction API and
+    integrated device humidity and temperature sensor.
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: devext3@gantabi.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+servers:
+  - url: 'https://localhost:8080/v1'
+  - url: 'http://localhost:8080/v1'
+tags:
+  - name: iOT Company
+    description: Crud company
+    externalDocs:
+      description: Company registration and maintenance
+      url: 'http://swagger.io'
+  - name: iOT User
+    description: User registration and maintenance
+  - name: iOT Device
+    description: Operations about User
+    externalDocs:
+      description: Find out more about our Device
+      url: 'http://swagger.io'
+paths:
+  /companies:
+    post:
+      tags:
+        - company
+      summary: Create a new Company
+      operationId: createCompany
+      requestBody:
+        description: Company object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompany'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyResponse'
+      x-codegen-request-body-name: body
+
+    get:
+      tags:
+        - company
+      summary: Get all Companies add optional filter
+      description: Returns all Company
+      operationId: getAllCompany
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnCompany'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+
+  '/companies/{companyId}':
+    put:
+      tags:
+        - company
+      summary: Update an existing Company
+      operationId: updateCompany
+      parameters:
+        - $ref: '#/components/parameters/companyIdPath'
+      requestBody:
+        description: Comapny object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompany'
+        required: true
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+
+      x-codegen-request-body-name: body
+
+    delete:
+      tags:
+        - company
+      summary: Deletes a Company
+      operationId: deleteCompany
+      parameters:
+        - $ref: '#/components/parameters/companyIdPath'
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+    get:
+      tags:
+        - company
+      summary: Find Company by ID
+      description: Returns a single Company
+      operationId: getCompanyById
+      parameters:
+        - $ref: '#/components/parameters/companyIdPath'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Company not found
+          content: {}
+  /users:
+    post:
+      tags:
+        - user
+      summary: Create a new User
+      operationId: createUser
+      requestBody:
+        description: User object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+        required: true
+        x-codegen-request-body-name: body
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+    get:
+      tags:
+        - user
+      summary: Get all Useres add optional filter
+      description: Returns list for User
+      operationId: getAllUser
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+        - $ref: '#/components/parameters/filterColumnUser'
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllUser'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+
+  '/users/{userId}':
+    put:
+      tags:
+        - user
+      summary: Update an existing User
+      operationId: updateUser
+      parameters:
+        - $ref: '#/components/parameters/userIdPath'
+      requestBody:
+        description: Update an existing User
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+        required: true
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+      x-codegen-request-body-name: body
+
+    delete:
+      tags:
+        - user
+      summary: Deletes a User
+      operationId: deleteUser
+      parameters:
+        - $ref: '#/components/parameters/userIdPath'
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+
+    get:
+      tags:
+        - user
+      summary: Get User by ID
+      description: Returns a single User
+      operationId: getUserById
+      parameters:
+        - $ref: '#/components/parameters/userIdPath'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+
+
+  '/users/{userId}/devices':
+    get:
+      tags:
+        - user
+      summary: Get all devices by ID User
+      description: Returns array Device
+      operationId: getAllDeviceByIdUser
+      parameters:
+        - $ref: '#/components/parameters/userIdPath'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+        - $ref: '#/components/parameters/filterColumnUser'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDeviceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/users/{userId}/avg-devices':
+    get:
+      tags:
+        - user
+      summary:  Get AVG
+      description: Get AVG temperature and humidity by ID User
+      operationId: getAvgDeviceByIdUser
+      parameters:
+        - $ref: '#/components/parameters/userIdPath'
+        - $ref: '#/components/parameters/avg'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+
+  '/users/export':
+    get:
+      tags:
+        - user
+      summary: Export to data
+      description: Export to date
+      operationId: exportDataUser
+      parameters:
+        - $ref: '#/components/parameters/formatFile'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnUser'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  /passwords:
+    put:
+      tags:
+        - password
+      summary: Update Password
+      operationId: updatePassword
+      parameters:
+        - $ref: '#/components/parameters/userIdPath'
+      requestBody:
+        description: User object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePassword'
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+      x-codegen-request-body-name: body
+
+    post:
+      tags:
+        - password
+      summary: Fogout Password
+      operationId: forgetPassword
+      requestBody:
+        description: create a new password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgetPassword'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+
+  /sessions:
+
+    post:
+      tags:
+        - session
+      summary: Logs User into the system
+      operationId: login
+      parameters:
+        - $ref: '#/components/parameters/email'
+        - $ref: '#/components/parameters/password'
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginOk'
+        '400':
+          description: Invalid username/password supplied
+          content: {}
+
+  '/sessions/{sessionId}':
+    get:
+      tags:
+        - session
+      summary: Get session state
+      operationId: statusSession
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusUser'
+        '400':
+          description: Invalid ID
+        '404':
+          description: Session not found
+          content: {}
+
+    delete:
+      tags:
+        - session
+      summary: Logout current logged in User session
+      operationId: logout
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        default:
+          description: successful operation
+          content: {}
+
+  /notifications:
+    post:
+      tags:
+        - notification
+      summary: Create a new Notifications for User
+      operationId: createNotification
+      requestBody:
+        description: Notifications object that definition for user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+
+    get:
+      tags:
+        - notification
+      summary: Get all notification add optional filter properties
+      description: Returns List a notifications
+      operationId: getAllNotifications
+      parameters:
+        - $ref: '#/components/parameters/companyIdQuery'
+        - $ref: '#/components/parameters/userIdQuery'
+        - $ref: '#/components/parameters/deviceIdQuery'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+        - $ref: '#/components/parameters/filterColumnNotification'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Notifications not found
+          content: {}
+
+  '/notifications/{notificationId}':
+    delete:
+      tags:
+        - notification
+      summary: Deletes a Notifications
+      operationId: deleteNotification
+      parameters:
+        - $ref: '#/components/parameters/notificationIdPath'
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Notifications not found
+          content: {}
+    put:
+      tags:
+        - notification
+      summary: Update an existing Notifications
+      operationId: updateNotification
+      parameters:
+        - $ref: '#/components/parameters/notificationIdPath'
+      requestBody:
+        description: Notifications object that definition for user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateNotification'
+        required: true
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Notification not found
+          content: {}
+      x-codegen-request-body-name: body
+
+    get:
+      tags:
+        - notification
+      summary: Get notification by ID
+      description: Returns a single notification
+      operationId: getNotificationById
+      parameters:
+        - $ref: '#/components/parameters/notificationIdPath'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Notification not found
+          content: {}
+
+  '/notifications/export':
+    get:
+      tags:
+        - notification
+      summary: Get notification by ID
+      description: Returns a single notification
+      operationId: getExportNotifications
+      parameters:
+        - $ref: '#/components/parameters/formatFile'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnNotification'
+        - $ref: '#/components/parameters/dateTo'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Notification not found
+          content: {}
+
+
+  /devices:
+    post:
+      tags:
+        - device
+      summary: create a new Device
+      operationId: createDevice
+      requestBody:
+        description: Device object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+
+    get:
+      tags:
+        - device
+      summary: Get all Devices add optional filter properties
+      description: Returns all Device
+      operationId: getAllDevice
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+        - $ref: '#/components/parameters/filterColumnDevice'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDeviceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  '/devices/{deviceId}':
+    get:
+      tags:
+        - device
+      summary: Get Device by ID
+      description: Returns a single Device
+      operationId: getDeviceById
+      parameters:
+        - $ref: '#/components/parameters/deviceIdPath'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindDevice'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+    put:
+      tags:
+        - device
+      summary: Update an existing Device
+      operationId: updateDevice
+      parameters:
+        - $ref: '#/components/parameters/deviceIdPath'
+      requestBody:
+        description: Device object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        required: true
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+      x-codegen-request-body-name: body
+
+    delete:
+      tags:
+        - device
+      summary: Delete a Device
+      operationId: deleteDevice
+      parameters:
+        - $ref: '#/components/parameters/deviceIdPath'
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  '/devices/export':
+    get:
+      tags:
+        - device
+      summary: Export data
+      description: Export file
+      operationId: exportFileDevice
+      parameters:
+        - $ref: '#/components/parameters/formatFile'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnDevice'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incidence'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  '/companies/{companyId}/devices':
+    get:
+      tags:
+        - company
+      summary: Get all devices by ID
+      description: Returns array Device
+      operationId: getAllDeviceByIdCompany
+      parameters:
+        - $ref: '#/components/parameters/companyIdPath'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+        - $ref: '#/components/parameters/filterColumnCompany'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDeviceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/companies/{companyId}/users':
+    get:
+      tags:
+        - company
+      summary: Get all users of a company
+      description: Get all users of a company
+      operationId: getAllUserByIdCompany
+      parameters:
+        - $ref: '#/components/parameters/companyIdPath'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnCompany'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllUser'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  '/companies/{companyId}/avg-devices':
+    get:
+      tags:
+        - company
+      summary:  Get AVG
+      description: Get AVG temperature by ID Entities
+      operationId: getAvgDeviceByIdCompany
+      parameters:
+        - $ref: '#/components/parameters/companyIdPath'
+        - $ref: '#/components/parameters/avg'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/companies/export':
+    get:
+      tags:
+        - company
+      summary: Export data
+      description: Export file
+      operationId: exportFileByIdCompany
+      parameters:
+        - $ref: '#/components/parameters/formatFile'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnCompany'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  /incidences:
+    get:
+      tags:
+        - incidence
+      summary: Get all Incidence add optional filter properties
+      description: Returns a single Device
+      operationId: getAllIncidence
+      parameters:
+        - $ref: '#/components/parameters/companyIdQuery'
+        - $ref: '#/components/parameters/userIdQuery'
+        - $ref: '#/components/parameters/deviceIdQuery'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+        - $ref: '#/components/parameters/filterColumnIncidence'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidenceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  '/incidences/{incidenceId}':
+    delete:
+      tags:
+        - incidence
+      summary: Delete a Incidence
+      operationId: deleteIncidence
+      parameters:
+        - $ref: '#/components/parameters/incidenceIdPath'
+      responses:
+        '204':
+          description: Successful operation
+          content: {}
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+    get:
+      tags:
+        - incidence
+      summary: Get Incidence by ID
+      description: Returns a single Device
+      operationId: getIncidenceById
+      parameters:
+        - $ref: '#/components/parameters/incidenceIdPath'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incidence'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+  '/incidences/export':
+    get:
+      tags:
+        - incidence
+      summary: Export data
+      description: Export file
+      operationId: exportDataIncidence
+      parameters:
+        - $ref: '#/components/parameters/formatFile'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnIncidence'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidenceList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  /events:
+    get:
+      tags:
+        - event
+      summary: Get all Events add optional filter properties
+      description: ''
+      operationId: getAllEvents
+      parameters:
+        - $ref: '#/components/parameters/companyIdQuery'
+        - $ref: '#/components/parameters/userIdQuery'
+        - $ref: '#/components/parameters/deviceIdQuery'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnEvent'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+
+  '/events/{eventId}':
+    get:
+      tags:
+        - event
+      summary: Get Envent by ID
+      description: Returns   Events By ID
+      operationId: getEventById
+      parameters:
+        - $ref: '#/components/parameters/eventPath'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: ID not found
+          content: {}
+
+  '/events/export':
+    get:
+      tags:
+        - event
+      summary: Export data
+      description: Export file
+      operationId: exportDataEvent
+      parameters:
+        - $ref: '#/components/parameters/formatFile'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/filterColumnEvent'
+        - $ref: '#/components/parameters/dateTo'
+        - $ref: '#/components/parameters/dateFrom'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventList'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: Device not found
+          content: {}
+
+components:
+
+  parameters:
+
+    companyIdQuery:
+      in: query
+      name: companyId
+      required: false
+      schema:
+        $ref: '#/components/schemas/companyId'
+
+    companyIdPath:
+      in: path
+      name: companyId
+      required: true
+      schema:
+        $ref: '#/components/schemas/companyId'
+
+    userIdQuery:
+      in: query
+      name: userId
+      required: false
+      schema:
+        $ref: '#/components/schemas/userId'
+
+    deviceIdQuery:
+      in: query
+      name: deviceId
+      required: false
+      schema:
+        $ref: '#/components/schemas/deviceId'
+
+    userIdPath:
+      in: path
+      name: userId
+      required: true
+      schema:
+        $ref: '#/components/schemas/userId'
+
+    notificationIdPath:
+      in: path
+      name: notificationId
+      required: true
+      schema:
+        $ref: '#/components/schemas/notificationId'
+
+    notificationIdQuery:
+      in: query
+      name: notificationId
+      required: true
+      schema:
+        $ref: '#/components/schemas/notificationId'
+
+    incidenceIdQuery:
+      in: query
+      name: incidenceId
+      required: true
+      schema:
+        $ref: '#/components/schemas/incidenceId'
+
+    incidenceIdPath:
+      in: path
+      name: incidenceId
+      required: true
+      schema:
+        $ref: '#/components/schemas/incidenceId'
+
+    deviceIdPath:
+      in: path
+      name: deviceId
+      required: true
+      schema:
+        $ref: '#/components/schemas/deviceId'
+
+    eventPath:
+      in: path
+      name: eventId
+      required: true
+      schema:
+        $ref: '#/components/schemas/eventId'
+
+    eventQuery:
+      in: query
+      name: eventId
+      required: true
+      schema:
+        $ref: '#/components/schemas/eventId'
+
+
+    offset:
+      in: query
+      name: offset
+      description: value offSet to search
+      required: false
+      schema:
+        $ref: '#/components/schemas/offset'
+
+    limit:
+      in: query
+      name: limit
+      description: value offSet to search
+      required: false
+      schema:
+        $ref: '#/components/schemas/limit'
+
+    sortBy:
+      in: query
+      name: sortBy
+      description: ''
+      required: false
+      schema:
+        $ref: '#/components/schemas/sortBy'
+
+    avg:
+      in: query
+      name: avg
+      description: Get AVG Devices
+      required: false
+      schema:
+        $ref: '#/components/schemas/avg'
+
+    columnName:
+      in: query
+      name: columnName
+      description: ''
+      required: false
+      schema:
+        $ref: '#/components/schemas/columnName'
+
+    sessionId:
+      in: path
+      name: sessionId
+      description: The ID for session
+      required: true
+      schema:
+        $ref: '#/components/schemas/sessionId'
+
+    email:
+      in: query
+      name: email
+      description: The user email for login
+      required: true
+      schema:
+        $ref: '#/components/schemas/email'
+
+    password:
+      in: query
+      name: password
+      description: The password for login
+      required: true
+      schema:
+        $ref: '#/components/schemas/password'
+
+    filterColumnCompany:
+      in: header
+      name: filterColumnName
+      description:  Add values to filter in your search
+      required: false
+      schema:
+        type: array
+        additionalProperties: true
+        items:
+          $ref: '#/components/schemas/FilterColumnCompany'
+
+    filterColumnDevice:
+      in: header
+      name: filterColumnName
+      description:  Add values to filter in your search
+      required: false
+      schema:
+        type: array
+        additionalProperties: true
+        items:
+          $ref: '#/components/schemas/FilterColumnDevice'
+
+    filterColumnUser:
+      in: header
+      name: filterColumnName
+      description:  Add values to filter in your search
+      required: false
+      schema:
+        type: array
+        additionalProperties: true
+        items:
+          $ref: '#/components/schemas/FilterColumnUser'
+
+    filterColumnNotification:
+      in: header
+      name: filterColumnName
+      description:  Add values to filter in your search
+      required: false
+      schema:
+        type: array
+        additionalProperties: true
+        items:
+          $ref: '#/components/schemas/FilterColumnNotification'
+
+    filterColumnEvent:
+      in: header
+      name: filterColumnName
+      description:  Add values to filter in your search
+      required: false
+      schema:
+        type: array
+        additionalProperties: true
+        items:
+          $ref: '#/components/schemas/FilterColumnEvent'
+
+    filterColumnIncidence:
+      in: header
+      name: filterColumnName
+      description:  Add values to filter in your search
+      required: false
+      schema:
+        type: array
+        additionalProperties: true
+        items:
+          $ref: '#/components/schemas/FilterColumnIncidence'
+
+
+
+    formatFile:
+      in: query
+      name: formatFile
+      description: 'Download file data'
+      required: true
+      schema:
+        $ref: '#/components/schemas/formatFile'
+
+    dateTo:
+      in: query
+      name: dateTo
+      description: 'Begin date to filter'
+      required: false
+      schema:
+        $ref: '#/components/schemas/date'
+
+    dateFrom:
+      in: query
+      name: dateFrom
+      description: 'Final date to filter filter'
+      required: false
+      schema:
+        $ref: '#/components/schemas/date'
+
+    permission:
+      in: query
+      name: permission
+      description: The user email for login
+      required: true
+      schema:
+        $ref: '#/components/schemas/permission'
+
+    role:
+      in: query
+      name: roler
+      description: The user email for login
+      required: true
+      schema:
+        $ref: '#/components/schemas/role'
+
+  requestBodies:
+    createCompany:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              companyName:
+                $ref: '#/components/schemas/companyName'
+              nif:
+                $ref: '#/components/schemas/nif'
+              address:
+                $ref: '#/components/schemas/nif'
+              codePostal:
+                $ref: '#/components/schemas/codePostal'
+              phone:
+                $ref: '#/components/schemas/phone'
+              email:
+                $ref: '#/components/schemas/email'
+              web:
+                $ref: '#/components/schemas/web'
+
+    createUser:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              role:
+                $ref: '#/components/schemas/roleName'
+              companyName:
+                $ref: '#/components/schemas/companyName'
+              name:
+                $ref: '#/components/schemas/name'
+              nicknames:
+                $ref: '#/components/schemas/nicknames'
+              email:
+                $ref: '#/components/schemas/email'
+              password:
+                $ref: '#/components/schemas/password'
+
+    fogoutPassword:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              email:
+                $ref: '#/components/schemas/email'
+
+    createNotifications:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              userName:
+                $ref: '#/components/schemas/name'
+              deviceName:
+                $ref: '#/components/schemas/deviceName'
+              email:
+                $ref: '#/components/schemas/email'
+              notificationName:
+                $ref: '#/components/schemas/notificationName'
+              condition:
+                $ref: '#/components/schemas/condition'
+              ValueCondicional:
+                $ref: '#/components/schemas/value'
+
+    createDevice:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              userId:
+                $ref: '#/components/schemas/userId'
+              companyId:
+                $ref: '#/components/schemas/companyId'
+              deviceName:
+                $ref: '#/components/schemas/deviceName'
+
+
+
+  schemas:
+    companyId:
+
+      # -- ID entities
+      type: string
+      format: uuid
+
+    userId:
+      type: string
+      format: uuid
+
+    deviceId:
+      type: string
+      format: uuid
+
+    notificationId:
+      type: string
+      format: uuid
+
+    incidenceId:
+      type: string
+      format: uuid
+
+    eventId:
+      type: string
+      format: uuid
+
+    roleId:
+      type: string
+      format: uuid
+
+    sessionId:
+      type: string
+      format: uuid
+
+    # -- all data for company
+    companyName:
+      type: string
+    nif:
+      type: string
+    address:
+      type: string
+    phone:
+      type: string
+    email:
+      type: string
+    web:
+      type: string
+
+    # -- all data for User
+    name:
+      type: string
+
+    nicknames:
+      type: string
+
+    roleName:
+      type: string
+
+    password:
+      type: string
+
+    description:
+      type: string
+
+    codePostal:
+      type: string
+
+
+    createdAt:
+      type: string
+      format: date-time
+
+    totalDevice:
+      type: integer
+      format: int64
+      example: 10
+
+    # -- Device data
+
+    deviceName:
+      type: string
+
+    statusDevice:
+      type: string
+      example: on
+
+    # -- data incidence
+
+    incidenceName:
+      type: string
+
+
+
+    value:
+      type: number
+      example: 26.3
+
+
+    condition:
+      type: string
+      example: ">50"
+
+    notificationName:
+      type: string
+
+
+
+    batery:
+      type: integer
+      format: int64
+      example: 58
+
+    # privileges
+
+    permission:
+      type: string
+      enum:
+        - INSERT
+        - UPDATE
+        - DELETE
+        - CREATE USER
+      default: INSERT
+
+    role:
+      type: string
+      enum:
+        - User
+        - Admin
+        - Super Admin
+      default: User
+
+
+
+    # -- data filter
+
+    offset:
+      type: integer
+      format: int64
+      default: 0
+
+    limit:
+      type: integer
+      format: int64
+      default: 50
+
+    sortBy:
+      type: string
+      enum:
+        - ASC
+        - DESC
+      default: ASC
+
+    avg:
+      type: string
+      enum:
+        - Temperature
+        - Humidity
+      default: Temperature
+
+    columnName:
+      type: string
+      enum:
+        - column1
+        - column2
+      default: column1
+
+
+    formatFile:
+      type: string
+      enum:
+        - CSV
+        - PDF
+        - XSLX
+        - TXT
+        - JSON
+        - XML
+        - HTML
+      default: CSV
+
+
+    date:
+      type: string
+      format: date
+
+    time:
+      type: string
+      format: time
+
+    dateTime:
+      type: string
+      format: date-time
+
+
+    size:
+      type: integer
+      format: int64
+      default: 0
+
+
+
+      ## -- create Objects
+
+    CreateCompany:
+      required:
+        - address
+        - codePostal
+        - companyName
+        - email
+        - nif
+        - phone
+        - web
+      type: object
+      additionalProperties: false
+      properties:
+        companyName:
+          $ref: '#/components/schemas/companyName'
+        nif:
+          $ref: '#/components/schemas/nif'
+        address:
+          $ref: '#/components/schemas/address'
+        codePostal:
+          $ref: '#/components/schemas/codePostal'
+        phone:
+          $ref: '#/components/schemas/phone'
+        email:
+          $ref: '#/components/schemas/email'
+        web:
+          $ref: '#/components/schemas/web'
+
+    Company:
+      required:
+        - address
+        - codePostal
+        - companyId
+        - companyName
+        - email
+        - nif
+        - phone
+        - web
+      type: object
+      additionalProperties: false
+      properties:
+        companyId:
+          $ref: '#/components/schemas/companyId'
+        companyName:
+          $ref: '#/components/schemas/companyName'
+        nif:
+          $ref: '#/components/schemas/nif'
+        address:
+          $ref: '#/components/schemas/address'
+        codePostal:
+          $ref: '#/components/schemas/codePostal'
+        phone:
+          $ref: '#/components/schemas/phone'
+        email:
+          $ref: '#/components/schemas/email'
+        web:
+          $ref: '#/components/schemas/web'
+
+    CompanyResponse:
+      required:
+        - companyId
+        - createdAt
+      type: object
+      additionalProperties: false
+      properties:
+        companyId:
+          $ref: '#/components/schemas/companyId'
+        createdAt:
+          $ref: '#/components/schemas/dateTime'
+
+
+    UpdateCompany:
+      required:
+        - address
+        - codePostal
+        - companyName
+        - nif
+        - phone
+        - web
+      type: object
+      additionalProperties: false
+      properties:
+        companyName:
+          $ref: '#/components/schemas/companyName'
+        nif:
+          $ref: '#/components/schemas/nif'
+        address:
+          $ref: '#/components/schemas/address'
+        codePostal:
+          $ref: '#/components/schemas/codePostal'
+        phone:
+          $ref: '#/components/schemas/phone'
+        web:
+          $ref: '#/components/schemas/web'
+
+    CompanyList:
+      type: object
+      additionalProperties: false
+      properties:
+        size:
+          $ref: '#/components/schemas/size'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Company'
+
+    Role:
+      required:
+        - roleId
+        - roleName
+        - description
+      type: object
+      additionalProperties: false
+      properties:
+        roleId:
+          $ref: '#/components/schemas/roleId'
+        roleName:
+          $ref: '#/components/schemas/roleName'
+        description:
+          $ref: '#/components/schemas/description'
+
+    CreateUser:
+      required:
+        - companyName
+        - email
+        - name
+        - nicknames
+        - password
+        - role
+      type: object
+      additionalProperties: false
+      properties:
+        role:
+          $ref: '#/components/schemas/roleName'
+        companyName:
+          $ref: '#/components/schemas/companyName'
+        name:
+          $ref: '#/components/schemas/name'
+        nicknames:
+          $ref: '#/components/schemas/nicknames'
+        email:
+          $ref: '#/components/schemas/email'
+        password:
+          $ref: '#/components/schemas/password'
+
+    User:
+      required:
+        - companyId
+        - email
+        - name
+        - nicknames
+        - createdAt
+        - role
+        - userId
+        - totalDevice
+      type: object
+      additionalProperties: false
+      properties:
+        userId:
+          $ref: '#/components/schemas/roleId'
+        companyId:
+          $ref: '#/components/schemas/companyId'
+        role:
+          $ref: '#/components/schemas/Role'
+        name:
+          $ref: '#/components/schemas/name'
+        nicknames:
+          $ref: '#/components/schemas/nicknames'
+        email:
+          $ref: '#/components/schemas/email'
+        createdAt:
+          $ref: '#/components/schemas/createdAt'
+        totalDevice:
+          $ref: '#/components/schemas/totalDevice'
+
+
+    UserResponse:
+      required:
+        - userId
+        - createdAt
+      type: object
+      additionalProperties: false
+      properties:
+        userId:
+          $ref: '#/components/schemas/userId'
+        createdAt:
+          $ref: '#/components/schemas/dateTime'
+
+
+    UserList:
+      required:
+        - companyName
+        - email
+        - name
+        - nicknames
+        - role
+        - totalDevice
+      type: object
+      additionalProperties: false
+      properties:
+
+        companyName:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        name:
+          $ref: '#/components/schemas/name'
+        nicknames:
+          $ref: '#/components/schemas/nicknames'
+        email:
+          $ref: '#/components/schemas/email'
+        totalDevice:
+          $ref: '#/components/schemas/totalDevice'
+
+    UpdateUser:
+      required:
+        - name
+        - nicknames
+        - role
+      type: object
+      additionalProperties: false
+      properties:
+        role:
+          $ref: '#/components/schemas/roleName'
+        name:
+          $ref: '#/components/schemas/name'
+        nicknames:
+          $ref: '#/components/schemas/nicknames'
+
+    AllUser:
+      type: object
+      required:
+        - items
+        - size
+      additionalProperties: false
+      properties:
+        size:
+          $ref: '#/components/schemas/size'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    LoginOk:
+      required:
+        - companyId
+        - email
+        - name
+        - nicknames
+        - role
+        - userId
+        - statusDevice
+      type: object
+      additionalProperties: false
+      properties:
+        userId:
+          $ref: '#/components/schemas/userId'
+        companyId:
+          $ref: '#/components/schemas/companyId'
+
+        role:
+          $ref: '#/components/schemas/Role'
+        name:
+          $ref: '#/components/schemas/name'
+        email:
+          $ref: '#/components/schemas/email'
+        statusDevice:
+          $ref: '#/components/schemas/statusDevice'
+
+    UpdatePassword:
+      type: object
+      required:
+        - newPassword
+      additionalProperties: false
+      properties:
+        newPassword:
+          $ref: '#/components/schemas/password'
+
+    ForgetPassword:
+      type: object
+      required:
+        - email
+      additionalProperties: false
+      properties:
+        email:
+          $ref: '#/components/schemas/email'
+    StatusUser:
+      type: object
+      additionalProperties: false
+      required:
+        - statusDevice
+        - code
+        - userId
+      properties:
+        userId:
+          $ref: '#/components/schemas/userId'
+        statusDevice:
+          $ref: '#/components/schemas/statusDevice'
+
+
+    Device:
+      required:
+        - companyId
+        - deviceName
+        - userId
+      type: object
+      additionalProperties: false
+      properties:
+
+        userId:
+          $ref: '#/components/schemas/userId'
+        companyId:
+          $ref: '#/components/schemas/companyId'
+        deviceName:
+          $ref: '#/components/schemas/deviceName'
+
+
+    FindDevice:
+      required:
+        - companyId
+        - userId
+        - deviceId
+        -  userRole
+        - deviceName
+        - humidity
+        - temperature
+        - batery
+        - statusDevice
+      type: object
+      additionalProperties: false
+      properties:
+        deviceId:
+          $ref: '#/components/schemas/deviceId'
+        companyId:
+          $ref: '#/components/schemas/companyId'
+        userId:
+          $ref: '#/components/schemas/userId'
+        userRole:
+          $ref: '#/components/schemas/Role'
+        deviceName:
+          $ref: '#/components/schemas/deviceName'
+        temperature:
+          $ref: '#/components/schemas/value'
+        humidity:
+          $ref: '#/components/schemas/value'
+        batery:
+          $ref: '#/components/schemas/batery'
+        statusDevice:
+          $ref: '#/components/schemas/statusDevice'
+
+    Operation:
+      type: object
+      required:
+        - operationName
+        - description
+        - entityName
+        - value
+      additionalProperties: false
+      properties:
+        operationName:
+          type: string
+          example: Name operation
+        description:
+          type: string
+          example: Description about this function
+        value:
+          $ref: '#/components/schemas/size'
+
+
+    CompanyDeviceList:
+      type: object
+      required:
+        - items
+        - size
+      additionalProperties: false
+      properties:
+        size:
+          $ref: '#/components/schemas/size'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindDevice'
+
+    Notification:
+      required:
+        - userName
+        - deviceName
+        - email
+        - notificationName
+        - condition
+        - conditionalValue
+
+      type: object
+      additionalProperties: false
+      properties:
+        userName:
+          $ref: '#/components/schemas/name'
+        deviceName:
+          $ref: '#/components/schemas/deviceName'
+        email:
+          $ref: '#/components/schemas/email'
+        notificationName:
+          $ref: '#/components/schemas/notificationName'
+        condition:
+          $ref: '#/components/schemas/condition'
+        conditionalValue:
+          $ref: '#/components/schemas/value'
+
+    updateNotification:
+      required:
+        - notificationName
+        - condition
+        - valueConditional
+      type: object
+      additionalProperties: false
+      properties:
+        notificationName:
+          $ref: '#/components/schemas/notificationName'
+        condition:
+          $ref: '#/components/schemas/condition'
+        valueConditional:
+          $ref: '#/components/schemas/value'
+
+    NotificationList:
+      required:
+        - items
+        - size
+      type: object
+      additionalProperties: false
+      properties:
+        size:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+
+    Event:
+      type: object
+      additionalProperties: false
+      required:
+        - userName
+        - deviceName
+        - eventName
+        - hourRecivedAt
+        - dateRecivedAt
+        - condition
+        - conditionalValuer
+        - currentValue
+      properties:
+        userName:
+          type: string
+          example: User
+        deviceName:
+          $ref: '#/components/schemas/name'
+        hourRecivedAt:
+          $ref: '#/components/schemas/time'
+        dateRecivedAt:
+          $ref: '#/components/schemas/date'
+        condition:
+          $ref: '#/components/schemas/condition'
+        conditionalValuer:
+          $ref: '#/components/schemas/value'
+        currentValue:
+          $ref: '#/components/schemas/value'
+
+    FilterColumnCompany:
+      type: object
+      required:
+        - columnName
+      additionalProperties: false
+      properties:
+        nameColumn:
+          type: string
+          enum:
+            - Nombre
+            - NIF
+            - Correo
+            - Telefono
+          default: Nombre
+
+    FilterColumnDevice:
+      type: object
+      required:
+        - columnName
+      additionalProperties: false
+      properties:
+        nameColumn:
+          type: string
+          enum:
+            - Nombre
+            - Nº Serie
+            - Empresa
+            - Bateria
+            - Temperatura
+            - Humedad
+            - Estado
+          default: Nombre
+
+    FilterColumnUser:
+      type: object
+      required:
+        - columnName
+      additionalProperties: false
+      properties:
+        nameColumn:
+          type: string
+          enum:
+            - Nombre
+            - Apellido
+            - Correo
+            - Rol
+            - Nº Dispositivo
+          default: Nombre
+
+    FilterColumnIncidence:
+      type: object
+      required:
+        - columnName
+      additionalProperties: false
+      properties:
+        nameColumn:
+          type: string
+          enum:
+            - Nombre
+            - Notificación
+            - Fecha
+            - Hora
+            - Condición
+            - Medida
+            - Duración Incidencia
+          default: Nombre
+
+    FilterColumnNotification:
+      type: object
+      required:
+        - columnName
+      additionalProperties: false
+      properties:
+        nameColumn:
+          type: string
+          enum:
+            - Nombre
+            - Dispositivo
+            - Condición
+            - Medida
+          default: Nombre
+
+    FilterColumnEvent:
+      type: object
+      required:
+        - columnName
+      additionalProperties: false
+      properties:
+        nameColumn:
+          type: string
+          enum:
+            - Nombre
+            - Notificación
+            - Fecha
+            - Hora
+            - Condiión
+            - Valor Medido
+          default: Nombre
+
+    Incidence:
+      type: object
+      additionalProperties: false
+      required:
+        - deviceId
+        - userId
+        - companyId
+        - deviceName
+        - incidenceName
+        - hourRecivedAt
+        - dateRecivedAt
+        - valuecConditional
+        - currentValue
+        - timeDuration
+      properties:
+        deviceId:
+          $ref: '#/components/schemas/deviceId'
+        userId:
+          $ref: '#/components/schemas/userId'
+        companyId:
+          $ref: '#/components/schemas/companyId'
+        incidenceName:
+          $ref: '#/components/schemas/incidenceName'
+        deviceName:
+          $ref: '#/components/schemas/deviceName'
+        hourRecivedAt:
+          $ref: '#/components/schemas/time'
+        dateRecivedAt:
+          $ref: '#/components/schemas/date'
+        valuecConditional:
+          $ref: '#/components/schemas/value'
+        currentValue:
+          $ref: '#/components/schemas/value'
+        timeDuration:
+          $ref: '#/components/schemas/time'
+
+    IncidenceList:
+      type: object
+      required:
+        - items
+        - size
+      additionalProperties: false
+      properties:
+        size:
+          $ref: '#/components/schemas/size'
+        items:
+          type: array
+          additionalProperties: false
+          items:
+            $ref: '#/components/schemas/Incidence'
+
+    EventList:
+      type: object
+      required:
+        - items
+        - size
+      additionalProperties: false
+      properties:
+        size:
+          $ref: '#/components/schemas/size'
+        items:
+          $ref: '#/components/schemas/Event'
+
+

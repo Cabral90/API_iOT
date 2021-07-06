@@ -56,7 +56,7 @@ public class API extends AbstractVerticle {
   public Future<Void> setUpInitialData(Void vd) {
     System.out.println(" Init2 Router.....");
 
-    RouterBuilder.create(vertx, "src/main/resources/openAPI3_v1_090621.yaml")
+    RouterBuilder.create(vertx, "src/main/resources/openApi_060721.yaml")
       .onSuccess(routerBuilder -> {
         System.out.println(" Init3 call function .....");
 
@@ -96,7 +96,9 @@ public class API extends AbstractVerticle {
     router.operation("getAllCompany").handler(this::getAllCompany);
     router.operation("getCompanyById").handler(this::getCompanyById);
     router.operation("getAllDeviceByIdCompany").handler(this::getAllDeviceByIdCompany);
-    router.operation("getAllDeviceByIdCompany").handler(this::getAllUserByIdCompany);
+    router.operation("getAllUserByIdCompany").handler(this::getAllUserByIdCompany); // TODO: Rever este metodo
+    router.operation("getAvgDeviceByIdCompany").handler(this::getAvgDeviceByIdCompany);
+    router.operation("exportFileByIdCompany").handler(this::exportFileByIdCompany);
 
     // CRUD User
     router.operation("createUser").handler(this::createUser);
@@ -104,8 +106,9 @@ public class API extends AbstractVerticle {
     router.operation("deleteUser").handler(this::deleteUser);
     router.operation("getAllUser").handler(this::getAllUser);
     router.operation("getUserById").handler(this::getUserById);
-    router.operation("getTaskByIdUser").handler(this::getTaskByIdUser);
-    router.operation("getUserById").handler(this::getAllDeviceByIdUser);
+    router.operation("getAllDeviceByIdUser").handler(this::getAllDeviceByIdUser);
+    router.operation("getAvgDeviceByIdUser").handler(this::getAvgDeviceByIdUser);
+    router.operation("exportDataUser").handler(this::exportDataUser);
 
     // pass User forget
     router.operation("forgetPassword").handler(this::recoverPassword);
@@ -123,34 +126,27 @@ public class API extends AbstractVerticle {
     router.operation("deleteDevice").handler(this::deleteDevice);
     router.operation("getAllDevice").handler(this::getAllDevice);
     router.operation("getDeviceById").handler(this::getDeviceById);
+    router.operation("exportFileDevice").handler(this::exportFileDevice);
 
-    router.operation("getAllDeviceByIdUser").handler(this::getAllDeviceByIdUser);
+    /*// Notifications
+    router.operation("createNotification").handler(this::createNotification);
+    router.operation("getAllNotifications").handler(this::getAllNotifications);
+    router.operation("deleteNotification").handler(this::deleteNotification);
+    router.operation("updateNotification").handler(this::updateNotification);
+    router.operation("getNotificationById").handler(this::getNotificationById);
+    router.operation("getExportNotifications").handler(this::getExportNotifications);
 
-    // Alert
-    router.operation("getAllAlert").handler(this::getAllAlert);
-    router.operation("getAlertById").handler(this::getAlertById);
-    router.operation("getAlertByIdEntities").handler(this::getAlertByIdEntities);
+    // Events
+    router.operation("getAllEvents").handler(this::getAllEvents);
+    router.operation("getEventById").handler(this::getEventById);
+    router.operation("exportDataEvent").handler(this::exportDataEvent);
 
-    // operations
-    router.operation("getAvgTemperatureByIdEntity").handler(this::getAvgTemperatureByIdEntity);
-    router.operation("getAvgHumidityByIdEntity").handler(this::getAvgHumidityByIdEntity);
-    router.operation("getSumDevicesSumByIdEntity").handler(this::getSumDevicesSumByIdEntity);
-    router.operation("getDevicesDelimiterByIdEntity").handler(this::getDevicesDelimiterByIdEntity);
-    router.operation("getDevicesOrderAscByIdEntity").handler(this::getDevicesOrderAscByIdEntity);
-    router.operation("getDevicesOrderDescByIdEntity").handler(this::getDevicesOrderDescByIdEntity);
-    router.operation("getDevicesIncidenceByIdEntity").handler(this::getDevicesIncidenceByIdEntity);
-    router.operation("exportFileByIdEntity").handler(this::exportFileByIdEntity);
+    // Incidence
+    router.operation("getAllIncidence").handler(this::getAllIncidence);
+    router.operation("deleteIncidence").handler(this::deleteIncidence);
+    router.operation("getIncidenceById").handler(this::getIncidenceById);
+    router.operation("exportDataIncidence").handler(this::exportDataIncidence);*/
 
-    router.operation("filterDevicesByIdEntity").handler(this::filterDevicesByIdEntity);
-    router.operation("filterDevicesDateByIdEntity").handler(this::filterDevicesDateByIdEntity);
-
-    // Task
-    router.operation("createTask").handler(this::createTask);
-    router.operation("updateTask").handler(this::updateTask);
-    router.operation("deleteTask").handler(this::deleteTask);
-    router.operation("getAllTask").handler(this::getAllTask);
-    router.operation("getTaskById").handler(this::getTaskById);
-    router.operation("getTaskByIdUser").handler(this::getTaskByIdUser);
 
   }
 
@@ -515,6 +511,16 @@ public class API extends AbstractVerticle {
 
   }
 
+  private void getAvgDeviceByIdCompany(RoutingContext routingContext){
+
+  }
+
+  private void exportFileByIdCompany(RoutingContext routingContext){
+
+  }
+
+
+
   // =============== CRUD USER ==========
 
   private void createUser(RoutingContext routingContext) { // TODO will by i create one a function validate if exist another user a similar id and email.
@@ -875,6 +881,14 @@ public class API extends AbstractVerticle {
       });
   }
 
+  private void getAvgDeviceByIdUser(RoutingContext routingContext){
+
+  }
+
+  private void exportDataUser(RoutingContext routingContext){
+
+  }
+
 
   // Password
 
@@ -1108,6 +1122,10 @@ public class API extends AbstractVerticle {
 
 
   private void getDeviceById(RoutingContext routingContext) {
+  }
+
+  private void exportFileDevice(RoutingContext routingContext){
+
   }
 
 
