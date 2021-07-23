@@ -1,7 +1,0 @@
-{
-  "host": "54.220.101.114",
-  "port": 5432,
-  "user": "chirpstack_user",
-  "database": "chirpstack",
-  "password": "user3344"
-}

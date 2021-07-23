@@ -164,7 +164,7 @@ CREATE TABLE "app_chirpstack_user".notification( -- task
     user_id UUID NOT NULL,
     create_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     device_name TEXT NOT NULL,
-    notify_name TEXT NOT NULL,
+    notification_name TEXT NOT NULL,
     condition TEXT NOT NULL,
     conditional_value FLOAT NOT NULL,
     email TEXT NOT NULL,
@@ -176,13 +176,13 @@ CREATE TABLE "app_chirpstack_user".incidence(
   user_id UUID NOT NULL,
   company_id UUID NOT NULL,
   device_name TEXT NOT NULL,
-  notify_name TEXT NOT NULL,
+  incidence_name TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   condition TEXT NOT NULL,
   value FLOAT NOT NULL,
   -- not duration bat will calculete time to recived notified and time actual
   FOREIGN KEY(user_id) REFERENCES "app_chirpstack_user".user(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  FOREIGN KEY(usecompany_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE
+  FOREIGN KEY(company_id) REFERENCES "app_chirpstack_user".company(id) ON DELETE RESTRICT ON UPDATE CASCADE
 
 );
 -----------------------------------------------------------
@@ -314,13 +314,14 @@ CREATE INDEX idx_device_location_tags ON "public".device_location(tags);
 -- helpe drop
 
 drop table
-app_chirpstack_user.alert,
+app_chirpstack_user.event,
 app_chirpstack_user.company,
 app_chirpstack_user.device,
 app_chirpstack_user."permission",
 app_chirpstack_user."role",
 app_chirpstack_user.role_permission,
 app_chirpstack_user.session_up,
-app_chirpstack_user.task,
+app_chirpstack_user.notification,
 app_chirpstack_user."user"
+app_chirpstack_user."incidence"
 

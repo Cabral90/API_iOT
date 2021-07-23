@@ -1,20 +1,27 @@
 package API;
 
 import io.vertx.core.Future;
+import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.pgclient.PgException;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.Tuple;
 
+import javax.sound.midi.Soundbank;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.sql.SQLOutput;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static API.createObject.getCompany;
 
 
 public class ValidateData {
@@ -509,9 +516,7 @@ public class ValidateData {
 
             rows.iterator().next().getInteger(0))
 
-          .eventually(v -> conn.close())
-
-        )
+          .eventually(v -> conn.close()))
         .onSuccess(v -> {
           System.out.println("****************************************************");
           System.out.println(" operation count device ok");
@@ -524,4 +529,183 @@ public class ValidateData {
 
   }
 
+
+  public Future<JsonArray> getListApp(PgPool pool, String id) {
+    System.out.println("call funtion ID app");
+    JsonArray app = new JsonArray();
+
+    String findApp = "SELECT app_id from app_chirpstack_user.company_app where company_id = '" + id + "'";
+
+    //String sql = sqlFilterCompany(routingContext);
+
+    System.out.println(findApp);
+
+    //System.out.println(findApp);
+
+    pool
+      .getConnection()
+      .compose(conn ->
+        conn
+          .query(findApp)
+          .execute()
+          .compose(result -> {
+            System.out.println("count: " + result.rowCount());
+
+
+            Row row = result.iterator().next();
+            app.add(row.getUUID("app_id"));
+
+            System.out.println("LIST: " + row.getUUID("app_id"));
+
+            return Future.succeededFuture(app);
+          })
+          .recover(err -> {
+            PgException x = (PgException) err;
+            if (x.getCode() != null) {
+              //return Future.failedFuture(sendErrorSql(x.getCode()).encode());
+            }
+            return Future.failedFuture(err);
+          })
+          .onSuccess(result -> {
+            //routingContext.response().putHeader("content-type", "application/json").end(result.encode());
+            System.out.println("SE HA COMPLETADO");
+            System.out.println(result.encodePrettily());
+          })
+          .onFailure(err -> {
+            //routingContext.response().end(err.getMessage());
+            System.out.println(err.getMessage());
+            conn.close();
+          }));
+
+    System.out.println("El APP: " + app.encodePrettily());
+    //return app;
+
+    return Future.succeededFuture(app);
+  }
+
+
+  public Future<Integer> getTotalApp(PgPool pool, String id) {
+    System.out.println("call funtion ID app");
+    //JsonArray app = new JsonArray();
+
+    String findApp = "SELECT COUNT(app_id) from app_chirpstack_user.company_app where company_id = '" + id + "'";
+
+    //String sql = sqlFilterCompany(routingContext);
+
+    System.out.println(findApp);
+
+    //System.out.println(findApp);
+
+    pool
+      .getConnection()
+      .compose(conn ->
+        conn
+          .query(findApp)
+          .execute()
+          .compose(result -> {
+            System.out.println("count: " + result.rowCount());
+
+            int countApp = result.iterator().next().getInteger(0);
+            return Future.succeededFuture(countApp);
+
+          })
+          .recover(err -> {
+            PgException x = (PgException) err;
+            if (x.getCode() != null) {
+              //return Future.failedFuture(sendErrorSql(x.getCode()).encode());
+            }
+            return Future.failedFuture(err);
+          })
+          .onSuccess(result -> {
+            //routingContext.response().putHeader("content-type", "application/json").end(result.encode());
+            System.out.println("SE HA COMPLETADO");
+            System.out.println(result);
+          })
+          .onFailure(err -> {
+            //routingContext.response().end(err.getMessage());
+            System.out.println(err.getMessage());
+            conn.close();
+          }));
+
+    //System.out.println("El APP: "+app);
+    //return app;
+
+    return Future.succeededFuture();
+  }
+
+
+  // =======================  12/07/2021 =============================
+
+  public static String sqlFilterApp(RoutingContext routingContext) {
+
+    final StringBuilder filter = new StringBuilder();
+   /* filter.append(" SELECT t1.id as userId,  t3.id as app_id, t3.name  " +
+      "FROM app_chirpstack_user.user t1 " +
+      " INNER JOIN app_chirpstack_user.company_app t2 ON t1.id = t2.user_id " +
+      " INNER JOIN app_chirpstack_user.app t3 ON t2.app_id = t3.id  ");*/
+
+    filter.append(
+
+     "SELECT t1.id, t2.id AS applicationId, t1.name, t1.serial "+
+      "FROM app_chirpstack_user.device t1 "+
+      "INNER JOIN app_chirpstack_user.app t2 ON t1.app_id = t2.id ");
+
+    MultiMap map = routingContext.request().params();
+    Optional.ofNullable(map.get("applicationId")).ifPresent(v -> filter.append(" WHERE t2.id =" + "  '" + v + "' "));
+/*    Optional.ofNullable(map.get("dateFrom")).ifPresent(v-> filter.append(" AND received_at BETWEEN " +  "  '"+v+"' "));
+    Optional.ofNullable(map.get("dateTo")).ifPresent(v-> filter.append(" AND " +  "  '"+v+"' "));*/
+
+    Optional.ofNullable(map.get("name")).ifPresent(v -> filter.append(" AND  t1.name = " + "  '" + v + "' "));
+    Optional.ofNullable(map.get("sortBy")).ifPresent(v -> filter.append(" ORDER BY t1.name " + v));
+    Optional.ofNullable(map.get("limit")).ifPresent(v -> filter.append(" LIMIT " + v));
+
+
+    return filter.toString();
+  }
+
+
+  public static String sqlFilterCompany(RoutingContext routingContext) {
+
+    final StringBuilder filter = new StringBuilder();
+
+    filter.append(
+      "SELECT t1.id AS company_id, t1.owner_id AS admin_id, t1.name, t2.id AS supervisor_id " +
+        "FROM app_chirpstack_user.company t1 INNER JOIN app_chirpstack_user.admin_company tX " +
+        "ON t1.id = tX.company_id " +
+        "INNER JOIN app_chirpstack_user.admin t2 ON tX.admin_id = t2.id ");
+
+    MultiMap map = routingContext.request().params();
+
+    Optional.ofNullable(map.get("name")).ifPresent(vd -> filter.append(" WHERE t1.name LIKE " + "  '%" + vd + "%' "));
+    Optional.ofNullable(map.get("sortBy")).ifPresent(vd -> filter.append(" ORDER BY t1.name " + vd));
+    Optional.ofNullable(map.get("limit")).ifPresent(vd -> filter.append(" LIMIT " + vd));
+
+    return filter.toString();
+  }
+
+  public static String sqlFilterAppToCompany(RoutingContext routingContext) {
+
+/*    SELECT t1.id,   t2.created_at as createdAt, t2.updated_at as updatedAt, t1.name  FROM app_chirpstack_user.app t1
+    INNER JOIN app_chirpstack_user.company_app t2 on t1.id = t2.app_id
+    WHERE t1.id = '5b890946-e0ee-4f1b-8937-4995007ede31' and t2.created_at between '2021-07-21' and '2021-07-22'*/
+
+
+    MultiMap map = routingContext.request().params();
+    String id = routingContext.request().getParam("companyId");
+    final StringBuilder filter = new StringBuilder();
+
+    filter.append("SELECT t1.id,   t2.created_at as createdAt, t2.updated_at as updatedAt, " +
+      "t1.name  FROM app_chirpstack_user.app t1 " +
+      "INNER JOIN app_chirpstack_user.company_app t2 on t1.id = t2.app_id " +
+      "WHERE t1.id = '" + id + "'");
+
+    Optional.ofNullable(map.get("dateTo")).ifPresent(v -> filter.append(" AND t2.created_at BETWEEN '" + v +"' "));
+    Optional.ofNullable(map.get("dateFrom")).ifPresent(v -> filter.append(" AND '" + v +"' "));
+
+    Optional.ofNullable(map.get("sortBy")).ifPresent(v -> filter.append(" ORDER BY t1.name " + v));
+    Optional.ofNullable(map.get("limit")).ifPresent(v -> filter.append(" LIMIT " + v));
+
+
+    return filter.toString();
+  }
 }

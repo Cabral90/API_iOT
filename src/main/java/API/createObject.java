@@ -1,5 +1,6 @@
 package API;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,20 +24,36 @@ public class createObject {
     return thisTask;
   }
 
-  public static JsonObject getCompany(JsonObject company){
+
+
+  public static JsonObject getCompany(JsonObject company, JsonObject app){
     JsonObject thisCompany = new JsonObject();
 
     thisCompany
-      .put("id", company.getString("id"))
-      .put("companyName", company.getString("company_name"))
-      .put("nif", company.getString("NIF"))
-      .put("address",  company.getString("address"))
-      .put("codePostal",  company.getString("code_postal"))
-      .put("phone",  company.getString("phone"))
-      .put("email",  company.getString("email"))
-      .put("web",  company.getString("web"));
-
+      .put("companyId", company.getString("user_id"))
+      .put("supervisorId", company.getString("id"))
+      .put("adminId", company.getString("name"))
+      .put("name", company.getString("nif"))
+      .put("application",  new JsonArray().add(app));
     return thisCompany;
+
+  }
+
+  public static JsonObject getDevice(JsonObject device){
+    JsonObject thisDevice= new JsonObject();
+
+    thisDevice
+      .put("userId", device.getString("user_id"))
+      .put("id", device.getString("id"))
+      .put("companyName", device.getString("name"))
+      .put("nif", device.getString("nif"))
+      .put("address",  device.getString("address"))
+      .put("codePostal",  device.getString("code_postal"))
+      .put("phone",  device.getString("phone"))
+      .put("email",  device.getString("email"))
+      .put("web",  device.getString("web"));
+
+    return thisDevice;
 
   }
 
