@@ -9,5 +9,6 @@
         <module name="ChirpStack_130521" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="16" />
   </component>
 </project>
